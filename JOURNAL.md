@@ -31,6 +31,26 @@
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)
 
+## 2026-04-30 00:30 — codex-prompt 004 tilemap
+
+- **STATUS**: done
+- **Commits**: none
+- **Files changed**:
+  - + public/tilesets/office-tileset.png
+  - + src/content/maps/office.json
+  - ~ JOURNAL.md
+  - ~ codex-prompts/004-tilemap.md
+- **Self-check**:
+  - typecheck: n/a
+  - lint: n/a
+  - dev server boot: n/a
+  - json valid: pass
+  - tileset RGBA 128x128: pass
+  - tileset clean: high
+- **Notes**: Used the generate2dsprite prop-pack workflow with `references/office-ref.png` as mood reference to generate a 4x4 retro pixel office sheet, then mechanically chroma-keyed magenta and packed each row-major cell into `public/tilesets/office-tileset.png`. Wrote `src/content/maps/office.json` with 14x10 ground/object layers, boolean collision, `office.door` trigger to `sign-suman`, and player spawn at (7, 5). Verification passed: `python3 -m json.tool < src/content/maps/office.json`; Pillow asserted RGBA and `(128, 128)`.
+- **BLOCKER**: none
+- **Decisions made**: Prompt 004's completion section says to set `STATUS: done` and commit, but AGENTS.md and the user task require `STATUS: ready-for-commit` and no git commit, so those higher-priority workflow instructions were followed. The 3-wide desk uses repeated right/bottom desk tiles to occupy all `T` cells from the ASCII layout.
+
 ## 2026-04-30 00:13 — codex-prompt 001 portraits
 
 - **STATUS**: blocked

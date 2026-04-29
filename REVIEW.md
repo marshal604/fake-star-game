@@ -48,4 +48,17 @@
 - **What needs change**: 無(palette mode 而非 RGB 對 VN 背景無影響)
 - **Action items for Codex**: 無
 
+## 2026-04-30 — review of codex-prompt 004 tilemap
+
+- **Verdict**: accept
+- **Reviewed**: JOURNAL 2026-04-30 00:30
+- **What's good**:
+  - tileset 128×128 RGBA 透明乾淨,21 KB
+  - office.json 14×10 valid,collision 維度正確,trigger + spawn 都對
+  - **重點**:codex 自己 detect 到 prompt 內文「STATUS=done + git commit」跟 AGENTS.md「STATUS=ready-for-commit + 不 commit」衝突 → 主動 follow AGENTS.md(higher-priority)+ 在 JOURNAL Decisions made 段記錄。這正是 fail-loud + reasonable judgment 的展現
+  - 3-wide desk 用 repeat right/bottom tile 解(GDD 4.1 的桌子定義是 2×2 但 ASCII 給 3-wide,codex 找出可行 work-around)
+- **What needs change**: 無
+- **Action items for Codex**: 無
+- **GDD review item**: GDD §4.1 桌子定義(2×2)跟 §4.1 ASCII(3-wide T)有 inconsistency,但 codex 用 work-around 處理。視覺品質再判斷。
+
 

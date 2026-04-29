@@ -1,6 +1,6 @@
 # Codex Prompt 004 — 生辦公室 tilemap + tileset + JSON
 
-STATUS: pending
+STATUS: done
 SKILL: `$generate2dmap` + `$generate2dsprite` (prop_pack 4x4)
 依賴:無
 產出:
