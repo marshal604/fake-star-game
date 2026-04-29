@@ -61,4 +61,18 @@
 - **Action items for Codex**: 無
 - **GDD review item**: GDD §4.1 桌子定義(2×2)跟 §4.1 ASCII(3-wide T)有 inconsistency,但 codex 用 work-around 處理。視覺品質再判斷。
 
+## 2026-04-30 — review of codex-prompt 005 scaffolding (split run)
+
+- **Verdict**: accept
+- **Reviewed**: JOURNAL 005 entries (Claude 5.1 + Codex 5.2~5.5),Claude 親跑 typecheck + build 都綠
+- **What's good**:
+  - 7 個 Dialogue 元件移植完成,LOCATION_STYLES 只剩 office + default
+  - types.ts 完整(GameMode/EventNode/EventGraph/TilemapData/ChoiceOption)
+  - gameStore minimal Zustand,後續 prompt 007 補完整邏輯
+  - characters / scenes / events stubs 就位
+  - 切兩邊跑(Claude 5.1 處理 sandbox 沒 pnpm 的 infra 問題,Codex 5.2~5.5 純 code)— 這是這次的 learning
+- **Infra finding**: codex sandbox 沒 pnpm + 沒網路 → 任何「需要 install / 跑 build / pnpm-anything」的 prompt 都要 Claude 接 infra 那一段。記錄在 AGENTS.md 是 follow-up。
+- **What needs change**: 無
+- **Action items**: 把這個 split-run pattern 在 AGENTS.md 補一段(下一次 commit 順便)
+
 

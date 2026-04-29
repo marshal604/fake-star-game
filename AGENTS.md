@@ -63,10 +63,21 @@
 - Package manager:**pnpm**
 - Test(v0.1 不需要,但留位置):Vitest + Testing Library
 
+## Sandbox 限制(macOS Seatbelt + workspace-write)
+
+你跑在 codex companion 的 `workspace-write` sandbox。實測限制:
+
+- **不能寫 `.git/`** → 不能 `git commit / push`
+- **不能執行 `pnpm` / `npm install`**(沒裝 + corepack 寫 cache 失敗 + 沒網路)
+- **無法跑 `pnpm dev / build / typecheck`**(因為上一條)
+- **可以**:寫 cwd 下任何非 .git 檔、執行已存在於 PATH 的二進位(node、python3、git read-only command 像 `git status`)、`view_image`、`image_gen`
+
+任何被擋的步驟,寫進 JOURNAL 的 self-check 段標 `n/a (sandbox)` 或 `deferred to Claude`,**不要 retry,不要繞**。Claude 會接手。
+
 ## Git 規範
 
 - branch:`main`(全部直接推 main,雛形階段)
-- **你不做 git commit / push** — codex companion 的 sandbox 在 `--write` 模式擋掉 `.git/`,你會失敗
+- **你不做 git commit / push** — sandbox 擋 `.git/`,你會失敗
 - 你完成工作後:
   1. 把所有產出檔放到正確路徑
   2. JOURNAL.md append schema entry(包含 self-check 結果)
