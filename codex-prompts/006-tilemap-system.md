@@ -1,6 +1,6 @@
 # Codex Prompt 006 — 實作 Tilemap 系統(渲染 + 鍵盤輸入 + 碰撞 + 觸發)
 
-STATUS: pending
+STATUS: done
 SKILL: 無(純 code task)
 依賴:**005 完成**(需要 src/core/types.ts、Zustand store 骨架);**004 完成**(需要 office.json + tileset);**003 完成**(需要 sprite sheet)
 產出:`src/components/Tilemap/*`、`src/core/tilemap.ts`、`src/store/gameStore.ts`(完成 tilemap 部分)
@@ -110,3 +110,16 @@ export const EndScene = ({ reason }: ...) => <div>END: {reason}</div>;
 - 不要寫對話 runtime / EventGraph 推進(prompt 007)
 - 不要做平滑插值的走路動畫(v0.1 grid-based 1 tile per keypress 就好,有打算做就在 JOURNAL 寫 BLOCKER 問 Claude)
 - 不要做手機觸控
+
+---
+
+## JOURNAL
+
+DATE: 2026-04-30
+SUMMARY: Implemented tilemap helpers, office map rendering, keyboard movement/interact handling, player/NPC sprite components, store tilemap state/actions, and App mode routing for tilemap/vn/end placeholders.
+BLOCKERS: none
+SELF-CHECK:
+- pnpm typecheck: deferred to Claude (sandbox lacks pnpm)
+- pnpm dev/browser check: deferred to Claude (sandbox lacks pnpm)
+- movement/collision/trigger behavior: implemented by code inspection; runtime verification deferred to Claude (sandbox lacks pnpm)
+- console errors: deferred to Claude (sandbox lacks pnpm)

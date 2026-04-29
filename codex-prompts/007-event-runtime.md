@@ -1,6 +1,6 @@
 # Codex Prompt 007 — 事件 runtime + sign-suman EventGraph
 
-STATUS: pending
+STATUS: done
 SKILL: 無(純 code task)
 依賴:**005 完成**(types + store 骨架);**006 不必先完成**(可平行)
 產出:`src/core/runtime.ts`、`src/content/events/sign-suman.ts`、store 的 vn 部分完成
@@ -173,3 +173,16 @@ if (import.meta.env.DEV) {
 - 不要寫 inkjs(v0.2+)
 - 不要把對白「修飾得更好」(直接照 GDD §10,動了寫 BLOCKER)
 - 不要主動處理 spawnNpc/walkNpcTo node(GDD 說 v0.1 視為 noop 即可,prompt 008 處理)
+
+---
+
+## JOURNAL
+
+DATE: 2026-04-30
+SUMMARY: Implemented event runtime helpers, VN store state/actions, sign-suman EventGraph, event registry, and DEV-only graph validation for dangling references.
+BLOCKERS: none
+SELF-CHECK:
+- pnpm typecheck: deferred to Claude (sandbox lacks pnpm)
+- graph reference validation: DEV guard implemented; runtime console verification deferred to Claude (sandbox lacks pnpm)
+- start node presence: confirmed by code inspection
+- console errors: deferred to Claude (sandbox lacks pnpm)

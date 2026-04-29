@@ -31,6 +31,37 @@
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)
 
+## 2026-04-30 ~01:00 — codex-prompt 007 event-runtime
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + src/core/runtime.ts (getNode / advance)
+  - ~ src/store/gameStore.ts (vn actions: advanceNode / chooseOption / enterEvent / endGame)
+  - ~ src/content/events/sign-suman.ts (full EventGraph from GDD §10)
+  - + src/content/events/index.ts (EVENTS map)
+  - + DEV-only dangling-next graph validator
+- **Self-check**:
+  - typecheck: deferred to Claude (now: pass)
+  - graph validation: DEV guard implemented
+  - start node presence: confirmed
+- **BLOCKER**: none
+
+## 2026-04-30 ~01:00 — codex-prompt 006 tilemap-system
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + src/core/tilemap.ts (isWalkable / findTrigger / neighbour)
+  - + src/components/Tilemap/{TilemapScene,PlayerSprite,NpcSprite}.tsx
+  - ~ src/store/gameStore.ts (player/npc state + movement actions)
+  - ~ src/App.tsx (mode routing tilemap/vn/end + placeholder VnScene/EndScene)
+- **Self-check**:
+  - typecheck: deferred to Claude (now: pass)
+  - dev server boot: deferred to Claude
+  - `git diff --check`: pass
+- **BLOCKER**: none
+
 ## 2026-04-30 00:30 — codex-prompt 004 tilemap
 
 - **STATUS**: done

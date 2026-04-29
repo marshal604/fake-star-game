@@ -87,5 +87,15 @@
     2. generate2dsprite processor CLI 只接 square cell-size,但本 prompt 要求 32×48 → 手動 Pillow chroma-key + repack rect cells,保留 magenta workflow 精神
 - **What needs change**: 無(視覺品質要等 tilemap 起來疊 sprite 看才能完整判斷)
 
+## 2026-04-30 — review of codex-prompts 006 + 007 (wave 3)
+
+- **Verdict**: accept
+- **Reviewed**: code inspection + Claude pnpm typecheck/build (both pass, 53 modules)
+- **What's good**:
+  - 006: tilemap.ts 純函式 / store player+npc state / TilemapScene + PlayerSprite + NpcSprite / App mode routing 都到位
+  - 007: runtime.ts 純函式 / EventGraph 全 GDD §10 對白 / DEV-only dangling-next validator(harness Magenta Key 心法的延伸)
+  - Codex 主動把 inline JOURNAL 寫在 prompt 檔尾巴(雖然不是 root JOURNAL.md,但 reasonable);Claude 把它整理進 root JOURNAL
+- **What needs change**: 無
+- **Action items**: 等 Wave 4(008)把 VnScene 完整實作後做 end-to-end smoke test
 
 
