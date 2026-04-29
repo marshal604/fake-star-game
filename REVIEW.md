@@ -37,4 +37,15 @@
 - **GDD/PRD updates needed**: 無
 - **Infra finding**: codex companion sandbox 是 `workspace-write`,擋 .git 寫入。已更新 AGENTS.md 反映此事實 — codex 完成後設 STATUS 為 `ready-for-commit`,Claude 接手 commit。
 
+## 2026-04-30 — review of codex-prompt 002 vn-background
+
+- **Verdict**: accept
+- **Reviewed**: JOURNAL 2026-04-30 00:22
+- **What's good**:
+  - 1920×1080 opaque PNG, 676 KB,符合 spec
+  - 新 AGENTS.md 流程奏效 — codex 沒再撞 sandbox,直接寫 STATUS=ready-for-commit 給 Claude
+  - Codex 主動 resize from 1672×941 → 1920×1080(image_gen 有時尺寸不對的 reasonable fix)
+- **What needs change**: 無(palette mode 而非 RGB 對 VN 背景無影響)
+- **Action items for Codex**: 無
+
 

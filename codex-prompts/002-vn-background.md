@@ -1,6 +1,6 @@
 # Codex Prompt 002 — 生 VN 模式辦公室背景
 
-STATUS: pending
+STATUS: done
 SKILL: `$generate2dmap`(visual_model=baked_raster)
 依賴:無
 產出:`public/backgrounds/office.png`(1920×1080, opaque PNG, < 1.5 MB)

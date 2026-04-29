@@ -46,3 +46,20 @@
 - **Notes**: Generated Suman first as style anchor, then protagonist and chenyifu matching the generated portrait set. Final PNGs are 1024x1536 RGBA and each is under 800 KB. Commit step could not be completed.
 - **BLOCKER**: Git commit is blocked because the environment rejects writes inside `.git`: `git add` failed with `fatal: Unable to create '/Users/hubert/self/coding/fake-star-game/.git/index.lock': Operation not permitted`, and `touch .git/codex-write-test` also failed with `Operation not permitted`.
 - **Decisions made**: Suman raw generation produced a white outer background instead of magenta, so the outer background was normalized to #FF00FF before running the generate2dsprite processor; final portraits were placed on a safe 1024x1536 transparent canvas after processor QC reported lower-edge contact from the half-body crops.
+
+## 2026-04-30 00:22 — codex-prompt 002 vn-background
+
+- **STATUS**: done
+- **Commits**: none
+- **Files changed**:
+  - + public/backgrounds/office.png
+  - ~ JOURNAL.md
+  - ~ codex-prompts/002-vn-background.md
+- **Self-check**:
+  - file exists: pass (`ls -lh public/backgrounds/office.png` -> 676K)
+  - Pillow size: pass (1920x1080)
+  - opaque PNG: pass (no transparency info)
+  - file size < 1.5 MB: pass (692557 bytes)
+- **Notes**: Used the generate2dmap baked_raster image-first pipeline to create a VN office background. The generated RGB raster was mechanically resized to 1920x1080 and palette-optimized as PNG to meet the prompt size cap.
+- **BLOCKER**: none
+- **Decisions made**: Generated image returned at 1672x941, so it was resized to the required 1920x1080 and optimized to stay under 1.5 MB.
