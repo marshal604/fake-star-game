@@ -75,4 +75,17 @@
 - **What needs change**: 無
 - **Action items**: 把這個 split-run pattern 在 AGENTS.md 補一段(下一次 commit 順便)
 
+## 2026-04-30 — review of codex-prompt 003 pixel-sprites
+
+- **Verdict**: accept
+- **Reviewed**: JOURNAL 2026-04-30 00:50
+- **What's good**:
+  - 三張 sprite sheet 128×192 RGBA、frame edge-touch pass、identity 自評 High
+  - 順序對:suman 當 anchor,然後 protagonist、chenyifu 對齊
+  - Codex 主動 detect 兩個衝突並用 reasonable judgment 處理:
+    1. prompt 內文 vs AGENTS.md(commit 該不該做)→ follow AGENTS.md
+    2. generate2dsprite processor CLI 只接 square cell-size,但本 prompt 要求 32×48 → 手動 Pillow chroma-key + repack rect cells,保留 magenta workflow 精神
+- **What needs change**: 無(視覺品質要等 tilemap 起來疊 sprite 看才能完整判斷)
+
+
 

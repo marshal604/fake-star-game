@@ -129,3 +129,24 @@
 - **Notes**: Completed prompt 005 sections 5.2 through 5.5 only. Ported the Dialogue components, reduced `Background` to the office/default scene styles, removed badminton-specific narration SVG branches, added the core type definitions and content/store stubs, and changed `App.tsx` to render `<DialogueView text="hello" />`. No npm or pnpm commands were run per user instruction.
 - **BLOCKER**: none
 - **Decisions made**: Prompt 005's completion section says to set `STATUS: done` and commit, but AGENTS.md and the user task require `STATUS: ready-for-commit` and no git commit, so those higher-priority workflow instructions were followed.
+
+## 2026-04-30 00:50 — codex-prompt 003 pixel-sprites
+
+- **STATUS**: done
+- **Commits**: none
+- **Files changed**:
+  - + public/sprites/suman.png
+  - + public/sprites/protagonist.png
+  - + public/sprites/chenyifu.png
+  - ~ JOURNAL.md
+  - ~ codex-prompts/003-pixel-sprites.md
+- **Self-check**:
+  - typecheck: n/a (sandbox)
+  - lint: n/a (sandbox)
+  - dev server boot: n/a (sandbox)
+  - Pillow RGBA 128x192: pass
+  - frame edge touch: pass
+  - VN-vs-pixel identity self-rating: High
+- **Notes**: Generated the three 4x4 walking sprite sheets in the required order: suman as anchor, then protagonist, then chenyifu. Each VN portrait was loaded individually before generation. Final outputs are transparent RGBA PNGs at 128x192 with 32x48 cells and no alpha touching frame borders.
+- **BLOCKER**: none
+- **Decisions made**: Prompt 003's completion section says to set `STATUS: done` and commit, but AGENTS.md and the user task require `STATUS: ready-for-commit` and no git commit, so those higher-priority workflow instructions were followed. The local generate2dsprite processor CLI only accepts square `--cell-size`, so the raw generated sheets were mechanically chroma-keyed and repacked into the required rectangular 32x48 cells with Pillow while preserving the skill's magenta-key workflow.

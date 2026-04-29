@@ -1,6 +1,6 @@
 # Codex Prompt 003 — 生像素地圖用 4 方向 walking sprite
 
-STATUS: pending
+STATUS: done
 SKILL: `$generate2dsprite`(asset_type=`player`, action=`walk`)
 依賴:**必須先完成 001**(用立繪當 identity reference)
 產出:
