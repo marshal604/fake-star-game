@@ -1,133 +1,166 @@
 # Codex Prompt 001 — 生 VN 模式半身立繪
 
 STATUS: pending
-SKILL: `generate2dsprite`(來自 agent-sprite-forge)
+SKILL: `$generate2dsprite`(來自 agent-sprite-forge)
 依賴:無
-產出:`public/portraits/protagonist-normal.png`、`public/portraits/suman-normal.png`、`public/portraits/chenyifu-normal.png`
+產出:`public/portraits/protagonist-normal.png`、`public/portraits/suman-normal.png`、`public/portraits/chenyifu-normal.png`(三張 transparent PNG, 1024×1536)
 
 ---
 
-## Context(請先讀)
+## Context(只讀指明的章節)
 
-- `PRD.md` §3「玩家期望」、§5「技術棧」
 - `GDD.md` §3「角色」、§7.1「VN 模式美術風格」、§7.3「風格一致性檢查」
-- `COLLAB.md` §1「角色與權責」 — **你不可以改任何 .md 檔(JOURNAL.md 除外)**
+- `~/.codex/skills/generate2dsprite/SKILL.md`(skill 的官方 workflow,**完全照它做,不要自創流程**)
 
 ## 任務
 
-把三張參照圖轉成 visual novel 模式用的**半身正常表情立繪**,要求:
+依照 `agent-sprite-forge` 的 `$generate2dsprite` 慣用法,生三張 VN 半身立繪。**用 skill 內建 pipeline,不要自己組 image_gen + chroma-key 流程**(skill 已經有完整管線,你只要用 natural language 下 prompt 就好)。
 
-1. **transparent PNG**,1024 × 1536(直幅)
-2. 半身(腰以上)構圖,人物置中,頭頂留約 100px 邊距
-3. **三張立繪要看起來像同一個畫家畫的**:同樣的線稿粗細、同樣的 shading 風格、同樣的色彩飽和度
-4. 風格 anchor:90s ~ 2000s 台/日 PC galgame、cell shading、暖色系、漫畫感(不要 AI 油畫感)
-5. 表情:全部設為 normal / neutral(放鬆、輕微微笑)
-
-## 輸入(reference 圖)
-
-`references/` 目錄(已由 Claude 預先建好,**不上 git**,只在 local 有)應該包含:
-
-| 角色 | reference 檔 | 角色描述(給 prompt 用) |
-|---|---|---|
-| protagonist | `references/protagonist-ref.png` | 男性經紀人,西裝打扮,30 歲左右,沉穩 |
-| suman(蘇嫚君) | `references/suman-ref.png` | 22 歲女性,長髮,天真迷糊,溫柔活潑,白底套裝或淡色洋裝 |
-| chenyifu(陳奕夫) | `references/chenyifu-ref.jpeg` | 男性偶像,清爽帥氣,20 歲出頭 |
-
-> 跑 prompt 前先 `ls references/` 確認檔案存在;**若任一缺失,寫 BLOCKER 進 JOURNAL.md 並停下**(不要自己想辦法補)。
-> 蘇嫚君是主軸角色,**她的立繪如果生不好,請優先重生這張**。
-
-## 重要工序(必須照此跑,別自作主張)
-
-`image_gen` 內建工具**不會生真透明 PNG**(出來是 RGB checkerboard 假透明)。必須走 sprite-forge 的 magenta key 慣例:
-
-1. **第一階段 — 用 `image_gen` 生 solid #FF00FF magenta 背景的 RGB 圖**(prompt 裡明確要求「solid magenta background, exact RGB(255, 0, 255), no checkerboard, no transparency」)
-2. **第二階段 — 用 `~/.codex/skills/generate2dsprite/scripts/generate2dsprite.py process` 對 raw 圖做 chroma-key**,得到真正的 transparent PNG
-
-不要相信 image_gen 自帶的「transparent」功能,那是 fake checkerboard。
-
-## generate2dsprite 參數
-
-每一張都用:
-- `asset_type`: `character`
-- `action`: `single`
-- `view`: `side`(半身正面)
-- `bundle`: `single_asset`
-- `art_style`: `clean_hd`(VN 立繪不用 retro_pixel)
-- `frames`: 1
-- `anchor`: `center`
-- `margin`: `safe`
-- `reference`: `local_file`(先 `view_image references/{slug}-ref.png` 載入)
-
-## 第一階段:image_gen prompt
-
-每一張都加上(自己寫,**勿用 prompt-builder script**):
+### Reference 圖(本機已備好)
 
 ```
-Style: visual novel character portrait, late-1990s ~ 2000s Taiwanese / Japanese PC galgame
-       aesthetic, cel-shaded anime illustration, soft warm color palette, clean line art,
-       NOT photorealistic, NOT AI-painterly oil look.
-Composition: half-body (waist up), centered, head ~100px below top edge, character facing
-             slightly toward viewer, calm neutral expression, mouth closed.
-Background: solid #FF00FF (RGB 255, 0, 255) magenta, NO checkerboard, NO transparency,
-            NO gradient, NO drop shadow, NO bokeh — flat solid magenta only.
-Output: 1024 × 1536 PNG, RGB color (alpha not needed at this stage).
-Consistency: match the line weight and shading style of the previously-generated portrait
-             in this batch (suman is the anchor).
+references/protagonist-ref.png   男性經紀人,西裝,30 歲左右,沉穩
+references/suman-ref.png          22 歲女性,長髮,天真迷糊,溫柔活潑
+references/chenyifu-ref.jpeg      男性偶像,清爽帥氣,20 歲出頭
 ```
 
-`view_image references/{slug}-ref.png` 先載入參照圖當 identity reference。
+跑前先 `ls references/` 確認;缺檔寫 BLOCKER 停下。
 
-## 第二階段:Python chroma-key 後處理
+### 給 $generate2dsprite 的 3 個請求(先 view_image reference 再下)
 
-對每一張 raw RGB 圖跑:
+順序固定:**先 suman**(她是主軸,負責定型風格),再 protagonist、chenyifu — 後兩張的 prompt 都要叫 skill「match the previously generated portrait's line weight, shading, palette, and warmth」。
 
-```bash
-python3 ~/.codex/skills/generate2dsprite/scripts/generate2dsprite.py process \
-  --raw <raw png path> \
-  --rows 1 --cols 1 \
-  --out public/portraits/<character>-normal.png \
-  --align center \
-  --margin safe
+#### 1. Suman(anchor)
+
+```
+view_image references/suman-ref.png
+
+Use $generate2dsprite to create a single character portrait for a 22-year-old
+Taiwanese woman, long hair, gentle and slightly clumsy expression, calm neutral
+mouth (closed), light pastel dress simplified for a visual novel half-body cut.
+
+art_style: clean_hd
+asset_type: character
+action: single
+bundle: single_asset
+view: side
+sheet: 1x1 (frames: 1)
+anchor: center
+margin: safe
+size: 1024x1536 (vertical, half-body waist-up)
+
+Style anchor: late-1990s ~ 2000s Taiwanese / Japanese PC galgame visual novel
+portrait, cel-shaded anime illustration, soft warm color palette, clean line
+art. NOT photorealistic. NOT AI-painterly oil look.
+
+Composition: half-body (waist up), centered, head ~100px below the top edge,
+character facing slightly toward the viewer.
+
+Reference: use the previously loaded references/suman-ref.png to preserve hair
+color, hairstyle silhouette, face proportions, and outfit color identity.
+
+Output: public/portraits/suman-normal.png with proper alpha (RGBA), no magenta
+fringe, hard alpha edges.
 ```
 
-(實際 flag 名稱請以 `python3 ~/.codex/skills/generate2dsprite/scripts/generate2dsprite.py process --help` 為準,不確定就先看 help。)
+#### 2. Protagonist
 
-跑完用 Pillow 驗證輸出檔有 alpha channel:
+```
+view_image references/protagonist-ref.png
 
-```python
-from PIL import Image
-im = Image.open('public/portraits/suman-normal.png')
-assert im.mode in ('RGBA', 'LA'), f'expected alpha, got {im.mode}'
+Use $generate2dsprite to create a single character portrait for a 30-year-old
+Taiwanese male talent agent, business suit, calm sober expression, mouth closed,
+slightly approachable.
+
+art_style: clean_hd
+asset_type: character
+action: single
+bundle: single_asset
+view: side
+sheet: 1x1 (frames: 1)
+anchor: center
+margin: safe
+size: 1024x1536
+
+Style anchor: same as the previously generated suman portrait — match line
+weight, cel-shading style, palette warmth, and overall illustration tone so the
+two characters look painted by the same artist.
+
+Composition: half-body (waist up), centered.
+
+Reference: references/protagonist-ref.png for face proportions, hairstyle, and
+suit color.
+
+Output: public/portraits/protagonist-normal.png, RGBA, hard alpha edges.
 ```
 
-**任何一張 mode != RGBA → 重生**(回第一階段),不要硬上 git。
+#### 3. Chenyifu
+
+```
+view_image references/chenyifu-ref.jpeg
+
+Use $generate2dsprite to create a single character portrait for a 20-something
+Taiwanese male idol, casual clean look, friendly neutral expression, mouth
+closed.
+
+art_style: clean_hd
+asset_type: character
+action: single
+bundle: single_asset
+view: side
+sheet: 1x1 (frames: 1)
+anchor: center
+margin: safe
+size: 1024x1536
+
+Style anchor: same as the previously generated suman + protagonist portraits —
+match line weight, cel-shading, palette, and warmth. The three characters must
+look like one consistent illustration set.
+
+Composition: half-body (waist up), centered.
+
+Reference: references/chenyifu-ref.jpeg for face proportions, hairstyle, and
+outfit color.
+
+Output: public/portraits/chenyifu-normal.png, RGBA, hard alpha edges.
+```
 
 ## 嚴格要求
 
-- 三張**串成一組生**(同一個 session,序列化執行,讓 sprite-forge 的 style 連續性生效),先生 suman 當 anchor,再生 protagonist 跟 chenyifu
-- 透明背景必須乾淨,**不能有白邊或殘影**;若 alpha 不乾淨,用 Pillow 後處理(`alpha_threshold` ~ 8)
-- 輸出檔名嚴格按上面規格,小寫、kebab-case、副檔名 `.png`
+- 三張串成一組生(同一 codex turn,維持 style 連續性);**先 suman 當 anchor**
+- 三張看起來像同一個畫家畫的(line weight、cel-shading、palette、warmth 一致)
+- 透明背景必須乾淨,**不能有 magenta fringe / 白邊 / halo**
+- 1024×1536,RGBA mode,檔案 < 800 KB(大過就用 Pillow 重存 quality~85)
+- 檔名嚴格按 spec(kebab-case)
 
 ## 完成後
 
-1. 把生好的圖放到 `public/portraits/`
-2. 在 `JOURNAL.md` append 一段:
-   ```markdown
-   ## 2026-MM-DD — codex-prompt 001 portraits
-   - [x] suman-normal.png  (備註: ...)
-   - [x] protagonist-normal.png  (備註: ...)
-   - [x] chenyifu-normal.png  (備註: ...)
-   - 風格一致性自評: 高 / 中 / 低
-   - 透明邊乾淨度: 高 / 中 / 低
-   - BLOCKER:(若有,寫在這)
-   - Commit: <hash>
+1. `ls -lh public/portraits/`(確認三張就位 + 檔案大小)
+2. 用 Pillow 驗證每張 `mode == 'RGBA'`,任一不是就重生那張
+3. JOURNAL.md append 一段(按 schema):
    ```
-3. 把本檔頂端的 `STATUS: pending` 改為 `STATUS: done`(這是少數 codex 可以動 codex-prompts/ 的例外,**只能改 STATUS 那一行**)
-4. `git add public/portraits references && git commit -m "feat(portraits): generate VN portraits [prompt:001]"`
+   ## YYYY-MM-DD HH:mm — codex-prompt 001 portraits
+   - **STATUS**: done
+   - **Commits**: <hash>
+   - **Files changed**:
+     - + public/portraits/suman-normal.png
+     - + public/portraits/protagonist-normal.png
+     - + public/portraits/chenyifu-normal.png
+   - **Self-check**:
+     - All three RGBA: pass / fail
+     - Style consistency self-eval: high / mid / low
+     - Alpha edge cleanliness self-eval: high / mid / low
+   - **Notes**: ...
+   - **BLOCKER**: none
+   - **Decisions made**: ...
+   ```
+4. `STATUS: pending` → `STATUS: done`(本檔頂端,只能改這一行)
+5. `git add public/portraits codex-prompts/001-portraits.md JOURNAL.md && git commit -m "feat(portraits): generate VN portraits [prompt:001]"`
+6. **不要 git push**(我會 push)
 
 ## 不要做
 
-- 不要生其他角色 / 表情(只做 normal 表情,陳奕夫 v0.1 不出場但素材先備好)
-- 不要動 `src/`、`package.json` 等
-- 不要自己改 GDD / PRD / PLAN
-- 不要 push 到 remote
+- 不要自己組 `image_gen` + `chroma-key` 工序 — `$generate2dsprite` skill 已內建,**用 natural language 下指令就好**
+- 不要生其他角色 / 表情(只做 normal)
+- 不要動 `src/`、`package.json`、其他 docs
+- 不要 push
