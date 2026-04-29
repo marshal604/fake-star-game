@@ -87,14 +87,83 @@
 
 ## 6. 成功條件(Definition of Done for v0.1)
 
-- [ ] 在瀏覽器能跑完「載入地圖 → 走到門口 → 簽約對話 → 結束」整條路徑
-- [ ] 像素美術:主角 + 蘇嫚君 4 方向 walking animation 流暢、辦公室 tilemap 看起來合理
-- [ ] VN 立繪:主角、蘇嫚君、陳奕夫各一張半身正常表情 + 辦公室 VN 背景一張,**直接從 Codex 產出來放進去就能看**(不能慘到還要 photoshop 一輪)
-- [ ] 像素風格 vs VN 風格分得開但不打架(同一遊戲感)
-- [ ] 對話有打字機效果、選項點擊有反饋
-- [ ] 沒有 console error / TS error
-- [ ] `npm run typecheck` 通過
-- [ ] 把整個流程錄一段 GIF 收進 `docs/`,作為「協作模式驗證成功」的證據
+### 6.1 必須存在的檔案(asset deliverables)
+
+```
+public/
+├── portraits/
+│   ├── protagonist-normal.png   (1024×1536, transparent, < 800 KB)
+│   ├── suman-normal.png          (1024×1536, transparent, < 800 KB)
+│   └── chenyifu-normal.png       (1024×1536, transparent, < 800 KB)
+├── backgrounds/
+│   └── office.png                (1920×1080, opaque, < 1.5 MB)
+├── sprites/
+│   ├── protagonist.png           (4×4 sheet, 128×192, transparent)
+│   ├── suman.png                 (4×4 sheet, 128×192, transparent)
+│   └── chenyifu.png              (4×4 sheet, 128×192, transparent)
+└── tilesets/
+    └── office-tileset.png        (transparent, ≥ 16 tiles, 32px each)
+```
+
+### 6.2 必須存在的程式檔(code deliverables)
+
+```
+package.json                   pnpm + scripts: dev/build/typecheck/lint
+tsconfig.json
+vite.config.ts
+tailwind.config.js
+postcss.config.js
+index.html
+src/
+├── main.tsx
+├── App.tsx                    根據 GameMode 切 TilemapScene / VnScene / EndScene
+├── components/
+│   ├── Dialogue/             移植自 badminton-story
+│   │   ├── Background.tsx
+│   │   ├── CharacterPortrait.tsx
+│   │   ├── ChoiceList.tsx
+│   │   ├── DialogueBox.tsx
+│   │   ├── DialogueView.tsx
+│   │   ├── useTypewriter.ts
+│   │   └── index.ts
+│   └── Tilemap/
+│       ├── TilemapScene.tsx
+│       ├── PlayerSprite.tsx
+│       └── NpcSprite.tsx
+├── core/
+│   ├── runtime.ts            事件 graph 推進
+│   ├── tilemap.ts            collision / trigger
+│   └── types.ts              GameMode / EventNode / GameState
+├── store/
+│   └── gameStore.ts          Zustand
+├── content/
+│   ├── characters.ts
+│   ├── scenes.ts
+│   ├── events/
+│   │   └── sign-suman.ts
+│   └── maps/
+│       └── office.json
+└── styles/
+    └── index.css
+```
+
+### 6.3 必須通過的驗證(self-check)
+
+- [ ] `pnpm install` 無 error
+- [ ] `pnpm typecheck` (= `tsc --noEmit`) pass
+- [ ] `pnpm build` 產出 dist/ 無 error
+- [ ] `pnpm dev` 開瀏覽器,從進入到結束畫面**完整跑過一次**沒 console error
+- [ ] 鍵盤(方向鍵 / WASD)能控制主角在 office tilemap 裡走動,撞牆會擋
+- [ ] 走到門口(trigger tile)自動進入 VN 模式
+- [ ] VN 模式打字機正常、選項可點
+- [ ] 走「不開門 / 直接簽約」兩條路徑都會進到 EndScene 顯示對應結語
+- [ ] 切回 tilemap 時 flag(`door_opened`、`signed_suman`)在 store 裡正確設置(可從 React devtools 看)
+
+### 6.4 必須產出的 docs
+
+- [ ] 一段流程錄 GIF 收進 `docs/v0.1-walkthrough.gif`
+- [ ] `JOURNAL.md` 至少 9 筆 entry(對應 9 個 codex-prompt)
+- [ ] `REVIEW.md` 至少 1 筆「accept」verdict
 
 ## 7. 風險
 

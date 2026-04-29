@@ -6,41 +6,56 @@
 
 跑通 GDD §10 的 demo 腳本:從辦公室 tilemap 走到門口 → 開門 → VN 對話 → 簽下蘇嫚君 → 結束畫面。
 
-## Codex prompt 排程
+DOD 在 `PRD.md` §6,逐項勾完才算 v0.1 完成。
 
-| 順序 | Prompt 檔 | 說明 | 依賴 | 狀態 |
+## Codex prompt 排程(全部已 ready)
+
+| # | Prompt | Skill | 依賴 | 狀態 |
 |---|---|---|---|---|
-| 1 | `codex-prompts/001-portraits.md` | 跑 agent-sprite-forge `generate2dsprite` 把 3 張參照圖轉成 VN 半身立繪 | 無 | 待 codex |
-| 2 | `codex-prompts/002-vn-background.md` | 跑 `generate2dmap` 把辦公室參照圖轉成 VN 模式背景圖(animation 風) | 無(可平行 1) | 待 claude 寫 |
-| 3 | `codex-prompts/003-pixel-sprites.md` | 用 step 1 的 VN 立繪當 reference,生 32×48 px 4 方向 walking sprite sheet ×3 | 1 完成 | 待 claude 寫 |
-| 4 | `codex-prompts/004-tilemap.md` | 跑 `generate2dmap` 生辦公室 tile-based 地圖 + tileset PNG + collision/trigger JSON | 無(可平行 1/2/3) | 待 claude 寫 |
-| 5 | `codex-prompts/005-scaffolding.md` | Vite + React + TS + Tailwind + Zustand 專案初始化,移植 badminton-story 的 Dialogue,建立 type 系統(GameMode/EventNode/GameState) | 無(可平行 1~4) | 待 claude 寫 |
-| 6 | `codex-prompts/006-tilemap-system.md` | 實作 `TilemapScene`、`PlayerSprite`、collision、trigger | 4, 5 | 待 claude 寫 |
-| 7 | `codex-prompts/007-event-runtime.md` | 實作 `core/runtime.ts` + Zustand store,寫 `events/sign-suman.ts` 把 GDD §10 腳本翻譯成 EventGraph | 5 | 待 claude 寫 |
-| 8 | `codex-prompts/008-mode-switch.md` | 把 tilemap → vn → end 模式切換串通,trigger 觸發後實際進對話、結束後跑結束畫面 | 6, 7 | 待 claude 寫 |
-| 9 | `codex-prompts/009-polish.md` | 樣式微調、typecheck、錄 GIF 收進 docs/ | 1~8 | 待 claude 寫 |
+| 001 | `001-portraits.md` | generate2dsprite | 無 | ⏳ pending |
+| 002 | `002-vn-background.md` | generate2dmap | 無 | ⏳ pending |
+| 003 | `003-pixel-sprites.md` | generate2dsprite | 001 | ⏳ pending |
+| 004 | `004-tilemap.md` | generate2dmap + sprite | 無 | ⏳ pending |
+| 005 | `005-scaffolding.md` | code | 無 | ⏳ pending |
+| 006 | `006-tilemap-system.md` | code | 003, 004, 005 | ⏳ pending |
+| 007 | `007-event-runtime.md` | code | 005 | ⏳ pending |
+| 008 | `008-mode-switch.md` | code | 005, 006, 007 | ⏳ pending |
+| 009 | `009-polish.md` | code + 錄 GIF | 001~008 | ⏳ pending |
 
-## 給 Claude 自己的下一步
+## 給人類的執行順序
 
-1. 把 `references/` 建好,把現有 4 張參照圖複製進去(這個動作 Claude 不能做 — 會動到 src/public 之外但對 codex 來說是 build artifact 來源,需要決定是 Claude 還是人類做)
-2. 寫完 002~005 prompt 讓人類可以餵第一輪
-3. 待 codex 跑完 001 後,review portraits 品質,決定要不要重生
+### Wave 1(可平行,4 份)
 
-## 給人類的下一步(餵給 codex)
+平行丟給 codex:
+- `001-portraits.md`
+- `002-vn-background.md`
+- `004-tilemap.md`
+- `005-scaffolding.md`
 
-按順序丟下面四份(前四份可平行):
+完成後 Claude review 一輪,看品質(立繪 / 背景 / tilemap / scaffolding 是否符合 GDD)。
 
-```
-codex-prompts/001-portraits.md
-codex-prompts/002-vn-background.md   ← 待 claude 寫
-codex-prompts/004-tilemap.md          ← 待 claude 寫
-codex-prompts/005-scaffolding.md      ← 待 claude 寫
-```
+### Wave 2(依賴 wave 1)
 
-只有 003-pixel-sprites 必須等 001 完成(因為要拿 portrait 當 reference)。
+- `003-pixel-sprites.md`(需要 001 的立繪當 reference)
 
-## Open questions(等人類決定)
+### Wave 3(依賴 wave 1 + 2)
 
-1. 參照圖檔放哪?目前在 `主角/`、`蘇曼君/`、`陳奕夫/`、`地圖/`(中文目錄)。要 Codex 還是人類負責複製到 `references/`?
-2. 要不要 `git init`?強烈建議要,讓 review diff 看得到。
-3. Package manager:npm / pnpm / bun?推薦 pnpm(快、跟 codex 搭配也熟)。
+平行:
+- `006-tilemap-system.md`(要 003、004、005)
+- `007-event-runtime.md`(要 005)
+
+### Wave 4(收尾)
+
+- `008-mode-switch.md`(要 005、006、007)
+- `009-polish.md`(要前面全部)
+
+## Claude review checkpoint
+
+每個 wave 結束 Claude review 一次:讀 JOURNAL,看 commit diff,在 REVIEW.md 寫 verdict(`accept` / `revise` / `reject`)。如果 `revise`/`reject`,回頭改對應 codex-prompt,把 STATUS 改回 `pending`,人類再餵一次。
+
+## Open questions(待確認)
+
+- [x] package manager → pnpm
+- [x] git init + push → 已完成,marshal604/fake-star-game
+- [x] agent-sprite-forge → 已裝
+- [ ] 第一波 codex 跑完後,風格如果嚴重不一致,要不要回頭重生 portraits?(預先決定:Yes,蘇嫚君優先)
