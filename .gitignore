@@ -1,0 +1,42 @@
+# Cloned tooling — installed into ~/.codex/skills, not part of this repo
+agent-sprite-forge/
+
+# Reference materials (copyrighted source images / scraped guides — local only)
+references/
+主角/
+蘇曼君/
+陳奕夫/
+地圖/
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Logs
+*.log
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Test / build artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Python (in case any helper scripts run locally)
+__pycache__/
+*.pyc
+.venv/
+
+# Codex / Claude scratch
+.codex/
+.claude-scratch/
