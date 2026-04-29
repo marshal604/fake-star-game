@@ -36,21 +36,71 @@ SKILL: `generate2dsprite`(來自 agent-sprite-forge)
 > 跑 prompt 前先 `ls references/` 確認檔案存在;**若任一缺失,寫 BLOCKER 進 JOURNAL.md 並停下**(不要自己想辦法補)。
 > 蘇嫚君是主軸角色,**她的立繪如果生不好,請優先重生這張**。
 
-## 跑 generate2dsprite 時的關鍵 prompt 詞
+## 重要工序(必須照此跑,別自作主張)
 
-每一張都加上:
+`image_gen` 內建工具**不會生真透明 PNG**(出來是 RGB checkerboard 假透明)。必須走 sprite-forge 的 magenta key 慣例:
+
+1. **第一階段 — 用 `image_gen` 生 solid #FF00FF magenta 背景的 RGB 圖**(prompt 裡明確要求「solid magenta background, exact RGB(255, 0, 255), no checkerboard, no transparency」)
+2. **第二階段 — 用 `~/.codex/skills/generate2dsprite/scripts/generate2dsprite.py process` 對 raw 圖做 chroma-key**,得到真正的 transparent PNG
+
+不要相信 image_gen 自帶的「transparent」功能,那是 fake checkerboard。
+
+## generate2dsprite 參數
+
+每一張都用:
+- `asset_type`: `character`
+- `action`: `single`
+- `view`: `side`(半身正面)
+- `bundle`: `single_asset`
+- `art_style`: `clean_hd`(VN 立繪不用 retro_pixel)
+- `frames`: 1
+- `anchor`: `center`
+- `margin`: `safe`
+- `reference`: `local_file`(先 `view_image references/{slug}-ref.png` 載入)
+
+## 第一階段:image_gen prompt
+
+每一張都加上(自己寫,**勿用 prompt-builder script**):
 
 ```
-Style: visual novel character portrait, late-1990s ~ 2000s Taiwanese / Japanese PC galgame aesthetic,
-       cel-shaded anime illustration, soft warm color palette, clean line art, NOT photorealistic,
-       NOT AI-painterly oil look.
-Composition: half-body (waist up), centered, head ~100px below top edge, character facing slightly
-             toward viewer, calm neutral expression, mouth closed.
-Output: transparent background PNG, 1024 × 1536, hard alpha edges (no halos).
-Consistency: match the line weight and shading style of the previous portraits in this batch.
+Style: visual novel character portrait, late-1990s ~ 2000s Taiwanese / Japanese PC galgame
+       aesthetic, cel-shaded anime illustration, soft warm color palette, clean line art,
+       NOT photorealistic, NOT AI-painterly oil look.
+Composition: half-body (waist up), centered, head ~100px below top edge, character facing
+             slightly toward viewer, calm neutral expression, mouth closed.
+Background: solid #FF00FF (RGB 255, 0, 255) magenta, NO checkerboard, NO transparency,
+            NO gradient, NO drop shadow, NO bokeh — flat solid magenta only.
+Output: 1024 × 1536 PNG, RGB color (alpha not needed at this stage).
+Consistency: match the line weight and shading style of the previously-generated portrait
+             in this batch (suman is the anchor).
 ```
 
-並把對應 `references/{character}-ref.png` 當 reference image 餵進去。
+`view_image references/{slug}-ref.png` 先載入參照圖當 identity reference。
+
+## 第二階段:Python chroma-key 後處理
+
+對每一張 raw RGB 圖跑:
+
+```bash
+python3 ~/.codex/skills/generate2dsprite/scripts/generate2dsprite.py process \
+  --raw <raw png path> \
+  --rows 1 --cols 1 \
+  --out public/portraits/<character>-normal.png \
+  --align center \
+  --margin safe
+```
+
+(實際 flag 名稱請以 `python3 ~/.codex/skills/generate2dsprite/scripts/generate2dsprite.py process --help` 為準,不確定就先看 help。)
+
+跑完用 Pillow 驗證輸出檔有 alpha channel:
+
+```python
+from PIL import Image
+im = Image.open('public/portraits/suman-normal.png')
+assert im.mode in ('RGBA', 'LA'), f'expected alpha, got {im.mode}'
+```
+
+**任何一張 mode != RGBA → 重生**(回第一階段),不要硬上 git。
 
 ## 嚴格要求
 
