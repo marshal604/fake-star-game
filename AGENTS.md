@@ -16,10 +16,9 @@
 3. 讀那份 codex-prompt 的全文,**並只讀它指明的 GDD/PRD 章節**(Lazy Load)
 4. 執行
 5. 完成後在 `JOURNAL.md` append 一筆(schema 在 JOURNAL.md 頂部)
-6. 把 codex-prompt 頂端 `STATUS: pending` 改為 `STATUS: done`(這是少數允許動 codex-prompts/ 的例外,**只能改 STATUS 那一行**)
-7. `git commit` 用 conventional format,message 帶 prompt 編號:
-   - `feat(portraits): generate VN portraits [prompt:001]`
-   - `feat(scaffolding): bootstrap vite/react/tailwind [prompt:005]`
+6. 把 codex-prompt 頂端 `STATUS:` 改為 `ready-for-commit`(成功)或 `blocked`(失敗)
+   - 這是少數允許動 codex-prompts/ 的例外,**只能改 STATUS 那一行**
+7. **不要 git commit / push**(見下方「Git 規範」)— Claude 會 review 後接手
 
 ## 你可以動的檔
 
@@ -67,8 +66,16 @@
 ## Git 規範
 
 - branch:`main`(全部直接推 main,雛形階段)
-- conventional commits + `[prompt:NNN]` suffix
-- `git push` 由人類觸發,你**不要 push**
+- **你不做 git commit / push** — codex companion 的 sandbox 在 `--write` 模式擋掉 `.git/`,你會失敗
+- 你完成工作後:
+  1. 把所有產出檔放到正確路徑
+  2. JOURNAL.md append schema entry(包含 self-check 結果)
+  3. **codex-prompt 頂端 STATUS:**
+     - 工作正常完成 → `STATUS: ready-for-commit`
+     - 任何 deliverable 失敗 / 不確定 → `STATUS: blocked` + JOURNAL 寫 BLOCKER
+  4. **不要 git add / git commit / git push**
+- 後續 Claude 會 review JOURNAL + diff,通過後改 STATUS 為 `done` 並 commit + push
+- 例外:若 prompt 內文還寫著 `git add ... && git commit ...`,**忽略它**,以本檔(AGENTS.md)為準
 - `.gitignore` 已寫好,別動
 
 ## agent-sprite-forge skills

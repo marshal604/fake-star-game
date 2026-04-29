@@ -1,6 +1,6 @@
 # Codex Prompt 001 — 生 VN 模式半身立繪
 
-STATUS: pending
+STATUS: done
 SKILL: `$generate2dsprite`(來自 agent-sprite-forge)
 依賴:無
 產出:`public/portraits/protagonist-normal.png`、`public/portraits/suman-normal.png`、`public/portraits/chenyifu-normal.png`(三張 transparent PNG, 1024×1536)
