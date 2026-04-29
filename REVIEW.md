@@ -22,4 +22,19 @@
 
 ---
 
-(尚無 review,等第一個 codex-prompt 完成後 Claude 在此 append)
+## 2026-04-30 — review of codex-prompt 001 portraits
+
+- **Verdict**: accept
+- **Reviewed**:
+  - JOURNAL entry: 2026-04-30 00:13
+  - Diff: `7319f0e` (vs `cc615ed`)
+- **What's good**:
+  - 三張 1024×1536 RGBA, < 800 KB,符合 spec
+  - Codex 主動處理「raw 生成是白底」的 edge case(用 magenta normalization 再走 generate2dsprite processor)— 這就是 GDD §0 強調的 fail-loud + 自己解決小問題,不亂 patch
+  - 順序正確:suman 當 anchor 先生
+- **What needs change**: 無(視覺品質要等 web app 跑起來疊到背景上才能完整判斷,先收貨)
+- **Action items for Codex**: 無
+- **GDD/PRD updates needed**: 無
+- **Infra finding**: codex companion sandbox 是 `workspace-write`,擋 .git 寫入。已更新 AGENTS.md 反映此事實 — codex 完成後設 STATUS 為 `ready-for-commit`,Claude 接手 commit。
+
+
