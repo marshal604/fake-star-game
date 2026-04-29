@@ -83,3 +83,19 @@
 - **Notes**: Used the generate2dmap baked_raster image-first pipeline to create a VN office background. The generated RGB raster was mechanically resized to 1920x1080 and palette-optimized as PNG to meet the prompt size cap.
 - **BLOCKER**: none
 - **Decisions made**: Generated image returned at 1672x941, so it was resized to the required 1920x1080 and optimized to stay under 1.5 MB.
+
+## 2026-04-30 00:32 — codex-prompt 005 scaffolding
+
+- **STATUS**: blocked
+- **Commits**: none
+- **Files changed**:
+  - ~ JOURNAL.md
+  - ~ codex-prompts/005-scaffolding.md
+- **Self-check**:
+  - typecheck: n/a
+  - lint: n/a
+  - dev server boot: n/a
+  - build: n/a
+- **Notes**: Stopped before scaffolding because the required package manager is unavailable in this sandbox. `pnpm create vite . --template react-ts` failed with `zsh:1: command not found: pnpm`. `corepack pnpm --version` also failed: default Corepack cache hit EPERM outside writable roots, and with `COREPACK_HOME=/tmp/corepack` Corepack attempted to fetch pnpm from `https://registry.npmjs.org/pnpm` but network access is restricted. No source scaffolding was written.
+- **BLOCKER**: Cannot run the required pnpm initialization/install/self-check commands in the current environment because pnpm is not installed and Corepack cannot fetch it under restricted network access.
+- **Decisions made**: Did not substitute npm for pnpm because AGENTS.md and prompt 005 specify pnpm as the package manager and fail-loud behavior for blocked deliverables.

@@ -40,3 +40,6 @@ __pycache__/
 # Codex / Claude scratch
 .codex/
 .claude-scratch/
+
+# pnpm
+.pnpm-store/

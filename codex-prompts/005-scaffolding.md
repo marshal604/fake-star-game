@@ -1,6 +1,6 @@
 # Codex Prompt 005 — Scaffolding(Vite + React + TS + Tailwind + Zustand)+ Dialogue 移植
 
-STATUS: pending
+STATUS: blocked
 SKILL: 無(純 code task)
 依賴:無(可平行 001~004)
 產出:可跑 `pnpm dev` 的 React 雛形,Dialogue 元件移植完成,types 系統定義到位
