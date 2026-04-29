@@ -1,9 +1,27 @@
 # Codex Prompt 005 — Scaffolding(Vite + React + TS + Tailwind + Zustand)+ Dialogue 移植
 
-STATUS: blocked
+STATUS: pending (5.1 已由 Claude 完成,codex 只做 5.2 ~ 5.5)
 SKILL: 無(純 code task)
 依賴:無(可平行 001~004)
 產出:可跑 `pnpm dev` 的 React 雛形,Dialogue 元件移植完成,types 系統定義到位
+
+## 注意:5.1 已由 Claude 完成
+
+Claude 已 scaffold 好(commit 24815fa / 055542e):
+- `package.json`(react 18 + zustand + tailwind 3 + vite 5)
+- `vite.config.ts`(含 `~` alias)
+- `tsconfig.json` + `tsconfig.node.json`(strict + paths)
+- `tailwind.config.js`(已含 court-wood / ink-* / star-rose)
+- `postcss.config.js`
+- `index.html`
+- `src/main.tsx`
+- `src/App.tsx`(暫 placeholder,本 prompt 5.5 會改)
+- `src/styles/index.css`(@tailwind base/components/utilities)
+- `pnpm-lock.yaml`
+
+`pnpm install` / `pnpm typecheck` / `pnpm build` 都已驗過綠燈。**你不需要再跑 `pnpm create vite` 或重 install**(別跑會炸 sandbox)。
+
+你的工作:從 5.2 開始做。
 
 ---
 
