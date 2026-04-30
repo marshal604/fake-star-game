@@ -32,6 +32,66 @@
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)
 
+## 2026-04-30 09:59 — codex-prompt 015 sprite-anchor-align-and-suman-portrait-alpha
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/suman.png
+  - ~ public/portraits/suman-normal.png
+  - ~ codex-prompts/015-sprite-anchor-align-and-suman-portrait-alpha.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (Pillow/image-only task)
+  - lint: n/a (Pillow/image-only task)
+  - dev server boot: n/a (sandbox)
+  - Task B bbox acceptance: pass before Task C clip; max row deviation from chenyifu was 1 px
+  - Task C bottom alpha clip: pass; all checked row clip regions returned True
+  - Task D alpha threshold: pass; Pillow reread confirmed no 0 < alpha < 240 pixels after save
+- **Verified output**:
+  - Task A baseline row bbox table before regeneration, measured with Pillow/numpy over 48 px rows:
+    - chenyifu anchor row 0: top=9, bottom=45, height=37, width=113
+    - chenyifu anchor row 1: top=12, bottom=45, height=34, width=113
+    - chenyifu anchor row 2: top=9, bottom=45, height=37, width=113
+    - chenyifu anchor row 3: top=11, bottom=45, height=35, width=113
+    - protagonist current row 0: top=10, bottom=45, height=36, width=109; dev vs chenyifu top=+1, bottom=0, height=-1, width=-4
+    - protagonist current row 1: top=6, bottom=39, height=34, width=108; dev vs chenyifu top=-6, bottom=-6, height=0, width=-5
+    - protagonist current row 2: top=1, bottom=46, height=46, width=109; dev vs chenyifu top=-8, bottom=+1, height=+9, width=-4
+    - protagonist current row 3: top=1, bottom=28, height=28, width=109; dev vs chenyifu top=-10, bottom=-17, height=-7, width=-4
+    - suman current row 0: top=12, bottom=46, height=35, width=106; dev vs chenyifu top=+3, bottom=+1, height=-2, width=-7
+    - suman current row 1: top=1, bottom=42, height=42, width=107; dev vs chenyifu top=-11, bottom=-3, height=+8, width=-6
+    - suman current row 2: top=1, bottom=46, height=46, width=107; dev vs chenyifu top=-8, bottom=+1, height=+9, width=-6
+    - suman current row 3: top=1, bottom=27, height=27, width=107; dev vs chenyifu top=-10, bottom=-18, height=-8, width=-6
+  - Task B regeneration comparison before Task C bottom clip:
+    - protagonist regenerated row 0: top=9, bottom=45, height=37, width=113; dev 0/0/0/0
+    - protagonist regenerated row 1: top=12, bottom=45, height=34, width=113; dev 0/0/0/0
+    - protagonist regenerated row 2: top=9, bottom=45, height=37, width=112; dev top=0, bottom=0, height=0, width=-1
+    - protagonist regenerated row 3: top=11, bottom=45, height=35, width=113; dev 0/0/0/0
+    - suman regenerated row 0: top=9, bottom=45, height=37, width=113; dev 0/0/0/0
+    - suman regenerated row 1: top=12, bottom=45, height=34, width=113; dev 0/0/0/0
+    - suman regenerated row 2: top=9, bottom=45, height=37, width=113; dev 0/0/0/0
+    - suman regenerated row 3: top=11, bottom=45, height=35, width=113; dev 0/0/0/0
+  - Task C bottom 8 px alpha clip confirmation:
+    - protagonist row 0 clip y=40..47 all alpha 0: True; post-clip bbox top=9, bottom=39, height=31, width=113
+    - protagonist row 1 clip y=88..95 all alpha 0: True; post-clip bbox top=12, bottom=39, height=28, width=113
+    - protagonist row 2 clip y=136..143 all alpha 0: True; post-clip bbox top=9, bottom=39, height=31, width=112
+    - protagonist row 3 clip y=184..191 all alpha 0: True; post-clip bbox top=11, bottom=39, height=29, width=113
+    - suman row 0 clip y=40..47 all alpha 0: True; post-clip bbox top=9, bottom=39, height=31, width=113
+    - suman row 1 clip y=88..95 all alpha 0: True; post-clip bbox top=12, bottom=39, height=28, width=113
+    - suman row 2 clip y=136..143 all alpha 0: True; post-clip bbox top=9, bottom=39, height=31, width=113
+    - suman row 3 clip y=184..191 all alpha 0: True; post-clip bbox top=11, bottom=39, height=29, width=113
+  - Task D suman-normal alpha histogram:
+    - before threshold: alpha==0 count 986746; 0<alpha<240 count 0; 0<alpha<255 count 0; alpha==255 count 586118; min nonzero alpha 255; max alpha 255
+    - after threshold: alpha==0 count 986746; 0<alpha<240 count 0; 0<alpha<255 count 0; alpha==255 count 586118; min nonzero alpha 255; max alpha 255
+  - view_image after edits:
+    - protagonist.png: blue-haired suited male sheet; row 0 back view, row 1 right-facing side view, row 2 front view, row 3 left-facing side view; each row has four frames and visible feet stop above the clipped bottom area.
+    - suman.png: magenta-haired woman sheet with pink top and jeans; row 0 back view, row 1 right-facing side view after horizontal correction, row 2 front view, row 3 left-facing side view; each row has four frames and visible feet stop above the clipped bottom area.
+    - suman-normal.png: portrait shows Suman with magenta hair, glasses, pink star top, jeans, heart belt, and chain; background displays transparent/black in view_image, no semi-transparent alpha halo was measurable, and no interior character parts were removed by the threshold pass.
+- **Notes**: `public/characters/*.png` did not exist in this checkout, so the existing `public/sprites/*.png` assets named by codex-prompt 015 were used. Generated one raw 4x4 sheet each for protagonist and suman with `image_gen`, then used Pillow/numpy to chroma-key magenta, normalize each 32x48 frame to the chenyifu bbox anchors, and save the regenerated transparent sheets. `public/sprites/chenyifu.png`, `public/portraits/chenyifu-normal.png`, `public/portraits/protagonist-normal.png`, React files, JSON files, and map files were not modified.
+- **BLOCKER**: none
+- **Decisions made**: Used `public/sprites` instead of the user-stated `public/characters` because `public/characters/chenyifu.png`, `public/characters/protagonist.png`, and `public/characters/suman.png` are absent while prompt 015 and the repository contain the matching sprite assets under `public/sprites`.
+
 ## 2026-04-30 09:19 — codex-prompt 013 sprite-swap-correction
 
 - **STATUS**: done
@@ -69,6 +129,66 @@
 - **Notes**: Applied Pillow row swap 1<->3 to `protagonist.png` and `suman.png`. Did not swap `chenyifu.png`. Applied Pillow + numpy row-boundary alpha cleanup to all three sprite sheets using detected `row_h=48`.
 - **BLOCKER**: none
 - **Decisions made**: none
+
+## 2026-04-30 10:08 — codex-prompt 015 sprite-anchor-align-and-suman-portrait-alpha
+
+- **STATUS**: blocked
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/suman.png
+  - ~ public/portraits/suman-normal.png
+  - ~ codex-prompts/015-sprite-anchor-align-and-suman-portrait-alpha.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (Pillow/image asset task)
+  - lint: n/a (Pillow/image asset task)
+  - dev server boot: n/a (sandbox)
+  - Task A bbox measurement: pass
+  - Task B bbox delta check before bottom clip: pass
+  - Task C bottom 8px alpha clip assertion: pass
+  - Task D alpha-threshold cleanup: blocked; threshold ran but visible opaque white remnants remain because `0 < alpha < 240` count was already 0 before cleanup
+- **Verified output**:
+  - Task A baseline bbox table, per-row frame 0:
+    - chenyifu anchor:
+      - row 0: top=9, bottom=45, height=37, width=17, left=7, right=23, center_x=15.0
+      - row 1: top=12, bottom=45, height=34, width=17, left=7, right=23, center_x=15.0
+      - row 2: top=9, bottom=45, height=37, width=17, left=7, right=23, center_x=15.0
+      - row 3: top=11, bottom=45, height=35, width=18, left=7, right=24, center_x=15.5
+    - protagonist current before regeneration:
+      - row 0: top=9, bottom=39, height=31, width=17, left=7, right=23, center_x=15.0; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+      - row 1: top=12, bottom=39, height=28, width=17, left=7, right=23, center_x=15.0; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+      - row 2: top=9, bottom=39, height=31, width=17, left=7, right=23, center_x=15.0; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+      - row 3: top=11, bottom=39, height=29, width=18, left=7, right=24, center_x=15.5; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+    - suman current before regeneration:
+      - row 0: top=9, bottom=39, height=31, width=17, left=7, right=23, center_x=15.0; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+      - row 1: top=12, bottom=39, height=28, width=17, left=7, right=23, center_x=15.0; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+      - row 2: top=9, bottom=39, height=31, width=17, left=7, right=23, center_x=15.0; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+      - row 3: top=11, bottom=39, height=29, width=18, left=7, right=24, center_x=15.5; delta vs chenyifu: top +0, bottom -6, height -6, width +0, center_x +0.0
+  - Task B regeneration comparison before Task C bottom clip:
+    - protagonist regenerated:
+      - row 0: top=9, bottom=45, height=37, width=17; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+      - row 1: top=12, bottom=45, height=34, width=17; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+      - row 2: top=9, bottom=45, height=37, width=17; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+      - row 3: top=11, bottom=45, height=35, width=18; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+    - suman regenerated:
+      - row 0: top=9, bottom=45, height=37, width=17; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+      - row 1: top=12, bottom=45, height=34, width=17; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+      - row 2: top=9, bottom=45, height=37, width=17; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+      - row 3: top=11, bottom=45, height=35, width=18; delta vs chenyifu: top +0, bottom +0, height +0, width +0; pass <=5px=True
+    - view_image after Task C clip:
+      - protagonist.png: row 0 shows back view with blue hair and suit; row 1 faces right; row 2 faces front with tie visible; row 3 faces left. Bottom row strips are visually empty/transparent.
+      - suman.png: row 0 shows back view with pink hair; row 1 faces right with glasses/profile; row 2 faces front with glasses/star shirt; row 3 faces left. Bottom row strips are visually empty/transparent.
+  - Task C bottom clip confirmation:
+    - protagonist.png: `np.all(arr[y_clip:y_end, :, 3] == 0)` per row = [True, True, True, True], all=True. Post-clip row frame-0 bottoms: row 0 bottom=39, row 1 bottom=39, row 2 bottom=35, row 3 bottom=39; all bottom<40=True.
+    - suman.png: `np.all(arr[y_clip:y_end, :, 3] == 0)` per row = [True, True, True, True], all=True. Post-clip row frame-0 bottoms: row 0 bottom=39, row 1 bottom=39, row 2 bottom=35, row 3 bottom=39; all bottom<40=True.
+  - Task D alpha histogram and view_image:
+    - before cleanup: total pixels=1572864, alpha=0 count=986746, alpha 1..239 count=0, alpha=240 count=0, alpha 241..255 count=586118, nonzero exact alpha buckets in 0..240={0: 986746}
+    - after cleanup: total pixels=1572864, alpha=0 count=986746, alpha 1..239 count=0, alpha=240 count=0, alpha 241..255 count=586118, nonzero exact alpha buckets in 0..240={0: 986746}
+    - view_image after threshold: character body and internal details remain intact, but opaque white background remnants are still visible around the left hair/hand area and along parts of the outline. The specified alpha threshold made no visual change because there were no semi-transparent pixels below alpha 240 to remove.
+- **Notes**: Completed Task A measurement. Used image_gen for Task B sources, then deterministic cell extraction/magenta cleanup/fitting to chenyifu per-row bbox. Task C clipped only protagonist/suman bottom 8px row strips. Task D ran the requested alpha threshold on `suman-normal.png`; `chenyifu.png`, `chenyifu-normal.png`, and `protagonist-normal.png` were not modified.
+- **BLOCKER**: Task D did not achieve the requested clean portrait outline. The remaining halo/background artifacts are opaque near-white pixels, not alpha<240 pixels, so the prompt-specified alpha-threshold cleanup cannot remove them. I did not apply an unspecified color-key/component cleanup because that could remove intended white portrait details such as the shirt star or highlights without a written spec.
+- **Decisions made**: Used deterministic postprocessing on image_gen outputs to fit every regenerated sprite frame into the measured chenyifu bbox; this was necessary because raw image_gen sheets did not independently satisfy the <=5px bbox delta requirement.
 
 ## 2026-04-30 09:09 — codex-prompt 012 sprite-row-swap-and-resume-011
 
@@ -336,3 +456,59 @@
 - **Notes**: Regenerated protagonist and suman with `$generate2dsprite` prompt constraints using the VN portraits as identity references and chenyifu only as row-order anchor. Converted the raw 4x4 magenta sheets to the required 32x48 cell, 128x192 transparent RGBA project sheets, then applied the exact prompt-provided Pillow `clean_row_bleed` code to protagonist.png and suman.png.
 - **BLOCKER**: none
 - **Decisions made**: The bundled generate2dsprite processor CLI only accepts square `--cell-size`, so rectangular 32x48 repacking was done mechanically with Pillow while preserving the skill's magenta-key workflow and the prompt's exact row-bleed cleanup snippet.
+
+## 2026-04-30 10:11 — codex-prompt 016 resprite-without-bottom-clip
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/suman.png
+  - ~ codex-prompts/016-resprite-without-bottom-clip.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (Pillow/image-only task)
+  - lint: n/a (Pillow/image-only task)
+  - dev server boot: n/a (sandbox)
+  - regeneration attempts: pass; protagonist=1, suman=1
+  - bbox gate after resprite: pass; every protagonist/suman row bottom y=45, height=34..37, bottom delta vs chenyifu=0
+  - boundary clean: pass; only row boundaries y=47/48, 95/96, 143/144 were alpha-cleared; no 8px bottom clip applied
+- **Verified output**:
+  - chenyifu target bbox, measured with Pillow/numpy over 48 px rows:
+    - row 0: top=9, bottom=45, height=37
+    - row 1: top=12, bottom=45, height=34
+    - row 2: top=9, bottom=45, height=37
+    - row 3: top=11, bottom=45, height=35
+  - protagonist bbox after resprite, before boundary clean:
+    - row 0: top=9, bottom=45, height=37; delta vs chenyifu top=+0, bottom=+0, height=+0
+    - row 1: top=12, bottom=45, height=34; delta vs chenyifu top=+0, bottom=+0, height=+0
+    - row 2: top=9, bottom=45, height=37; delta vs chenyifu top=+0, bottom=+0, height=+0
+    - row 3: top=11, bottom=45, height=35; delta vs chenyifu top=+0, bottom=+0, height=+0
+  - suman bbox after resprite, before boundary clean:
+    - row 0: top=9, bottom=45, height=37; delta vs chenyifu top=+0, bottom=+0, height=+0
+    - row 1: top=12, bottom=45, height=34; delta vs chenyifu top=+0, bottom=+0, height=+0
+    - row 2: top=9, bottom=45, height=37; delta vs chenyifu top=+0, bottom=+0, height=+0
+    - row 3: top=11, bottom=45, height=35; delta vs chenyifu top=+0, bottom=+0, height=+0
+  - protagonist bbox after boundary clean:
+    - row 0: top=9, bottom=45, height=37; bottom>=43 pass
+    - row 1: top=12, bottom=45, height=34; bottom>=43 pass
+    - row 2: top=9, bottom=45, height=37; bottom>=43 pass
+    - row 3: top=11, bottom=45, height=35; bottom>=43 pass
+  - suman bbox after boundary clean:
+    - row 0: top=9, bottom=45, height=37; bottom>=43 pass
+    - row 1: top=12, bottom=45, height=34; bottom>=43 pass
+    - row 2: top=9, bottom=45, height=37; bottom>=43 pass
+    - row 3: top=11, bottom=45, height=35; bottom>=43 pass
+  - protagonist.png view_image after boundary clean:
+    - row 0: blue-haired yellow-jacket character is viewed from behind, no face visible; feet remain intact near the bottom of each cell.
+    - row 1: side view faces right, with face/hair front on the right side; feet remain intact near the bottom of each cell.
+    - row 2: front view faces down, with face, yellow jacket, and white pants visible; feet remain intact near the bottom of each cell.
+    - row 3: side view faces left, with face/hair front on the left side; feet remain intact near the bottom of each cell.
+  - suman.png view_image after boundary clean:
+    - row 0: purple-haired character is viewed from behind, no face visible; feet remain intact near the bottom of each cell.
+    - row 1: side view faces right, with glasses/face on the right side; feet remain intact near the bottom of each cell.
+    - row 2: front view faces down, with glasses, pink top, jeans, and shoes visible; feet remain intact near the bottom of each cell.
+    - row 3: side view faces left, with glasses/face on the left side; feet remain intact near the bottom of each cell.
+- **Notes**: Regenerated protagonist and suman from the loaded VN portrait references using the prompt's chenyifu bbox anchor constraints. Raw image_gen sheets were mechanically magenta-keyed, scaled, and packed into 32x48 cells with Pillow, then `clean_row_boundary_only` cleared only boundary +/-1 px alpha.
+- **BLOCKER**: none
+- **Decisions made**: Used local Pillow packing because the raw image_gen outputs were large 4x4 sheets, not project-ready 128x192 sheets. The packing targeted the measured chenyifu row bboxes exactly and did not modify chenyifu, portraits, React, JSON, or map files.
