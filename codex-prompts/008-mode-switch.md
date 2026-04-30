@@ -1,6 +1,6 @@
 # Codex Prompt 008 — VnScene 完成 + Mode 切換 + EndScene + Fade
 
-STATUS: pending
+STATUS: done
 SKILL: 無(純 code task)
 依賴:**005、006、007 全部完成**
 產出:`src/components/VnScene.tsx`、`src/components/EndScene.tsx`、`src/App.tsx` 完整版、模式切換 fade

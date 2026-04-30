@@ -181,3 +181,24 @@
 - **Notes**: Generated the three 4x4 walking sprite sheets in the required order: suman as anchor, then protagonist, then chenyifu. Each VN portrait was loaded individually before generation. Final outputs are transparent RGBA PNGs at 128x192 with 32x48 cells and no alpha touching frame borders.
 - **BLOCKER**: none
 - **Decisions made**: Prompt 003's completion section says to set `STATUS: done` and commit, but AGENTS.md and the user task require `STATUS: ready-for-commit` and no git commit, so those higher-priority workflow instructions were followed. The local generate2dsprite processor CLI only accepts square `--cell-size`, so the raw generated sheets were mechanically chroma-keyed and repacked into the required rectangular 32x48 cells with Pillow while preserving the skill's magenta-key workflow.
+
+## 2026-04-30 01:02 — codex-prompt 008 mode-switch
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + src/components/VnScene.tsx
+  - + src/components/EndScene.tsx
+  - + src/components/ModeFader.tsx
+  - ~ src/App.tsx
+  - ~ src/components/Dialogue/DialogueBox.tsx
+  - ~ JOURNAL.md
+  - ~ codex-prompts/008-mode-switch.md
+- **Self-check**:
+  - typecheck: pass (`node_modules/.bin/tsc --noEmit`)
+  - lint: n/a
+  - dev server boot: n/a (sandbox: `listen EPERM 127.0.0.1:5173`)
+  - build: pass (`node_modules/.bin/vite build`)
+- **Notes**: Implemented VN event rendering from `EVENTS[eventId]`, office background wiring, choice and keyboard handling, v0.1 noop auto-advance for `spawnNpc`/`walkNpcTo`, automatic `returnToMap`/`end` transitions, final end screen, and App-level mode fade routing. Did not implement NPC walking animation, save/load, audio, or framer-motion. Added only a `data-dialogue-advance` marker to the existing Dialogue button so keyboard advance can reuse its current typewriter finish/advance behavior without changing the component flow.
+- **BLOCKER**: none
+- **Decisions made**: Prompt 008's completion section says to set `STATUS: done` and commit, but AGENTS.md and the user task require `STATUS: ready-for-commit` and no git commit, so those higher-priority workflow instructions were followed.

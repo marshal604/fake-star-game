@@ -26,6 +26,7 @@ export function DialogueBox({ speaker, text, onAdvance, showContinueHint = true 
   return (
     <button
       type="button"
+      data-dialogue-advance
       onClick={handleClick}
       disabled={!onAdvance && done}
       className={`w-full text-left ${containerClass} p-4 sm:p-5 active:scale-[0.998] transition`}
