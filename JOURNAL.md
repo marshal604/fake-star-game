@@ -32,6 +32,44 @@
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)
 
+## 2026-04-30 09:19 — codex-prompt 013 sprite-swap-correction
+
+- **STATUS**: done
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/suman.png
+  - ~ public/sprites/chenyifu.png
+  - ~ codex-prompts/013-sprite-swap-correction.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (Pillow-only image correction)
+  - lint: n/a (Pillow-only image correction)
+  - dev server boot: n/a (sandbox)
+  - row swap script: pass
+  - row bleed alpha check: pass; rows 47, 48, 95, 96, 143, 144 have alpha sum 0 in all three sheets
+- **Verified output**:
+  - `public/sprites/protagonist.png` view_image after corrective swap and bleed clean:
+    - row 0: character is seen from behind, with back of purple hair and no face visible; matches up.
+    - row 1: side view with the face/body pointing toward the right side of the frame; matches right.
+    - row 2: character faces forward toward the viewer, with face and front clothing visible; matches down.
+    - row 3: side view with the face/body pointing toward the left side of the frame; matches left.
+  - `public/sprites/suman.png` view_image after corrective swap and bleed clean:
+    - row 0: character is seen from behind, with pink hair back visible and no face visible; matches up.
+    - row 1: side view with the face/body pointing toward the right side of the frame; matches right.
+    - row 2: character faces forward toward the viewer, with face, pink hair, and front outfit visible; matches down.
+    - row 3: side view with the face/body pointing toward the left side of the frame; matches left.
+  - `public/sprites/chenyifu.png` view_image after bleed clean, with row order left unswapped:
+    - row 0: character is seen from behind, with back of dark hair and no face visible; matches up.
+    - row 1: side view with the face/body pointing toward the right side of the frame; matches right.
+    - row 2: character faces forward toward the viewer, with face and front outfit visible; matches down.
+    - row 3: side view with the face/body pointing toward the left side of the frame; matches left.
+  - All three sheets match target row order `{up:0, right:1, down:2, left:3}`.
+  - bleed_px used: 1. Pillow/numpy check confirms boundary rows 47/48, 95/96, and 143/144 are fully transparent for all three sheets; view_image shows clean separation between rows with no visible 1px inter-row bleed.
+- **Notes**: Applied Pillow row swap 1<->3 to `protagonist.png` and `suman.png`. Did not swap `chenyifu.png`. Applied Pillow + numpy row-boundary alpha cleanup to all three sprite sheets using detected `row_h=48`.
+- **BLOCKER**: none
+- **Decisions made**: none
+
 ## 2026-04-30 09:09 — codex-prompt 012 sprite-row-swap-and-resume-011
 
 - **STATUS**: done

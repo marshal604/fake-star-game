@@ -1,6 +1,6 @@
 # Codex Prompt 013 — Sprite swap 修正(Claude 已肉眼確認過)+ row bleed 清理
 
-STATUS: pending
+STATUS: done
 SKILL: Pillow + `view_image`
 依賴:012 完成
 產出:
