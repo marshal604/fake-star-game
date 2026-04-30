@@ -32,6 +32,99 @@
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)
 
+## 2026-05-01 01:44 — codex-prompt 028 office-redo-full-pipeline
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/maps/office-base.png
+  - + public/maps/office-dressed-reference.png
+  - + public/maps/office-layered-preview.png
+  - ~ public/props/office/desk.png
+  - ~ public/props/office/chair.png
+  - ~ public/props/office/bookshelf.png
+  - ~ public/props/office/door.png
+  - ~ public/props/office/phone.png
+  - ~ public/props/office/paper.png
+  - ~ public/props/office/plant.png
+  - ~ public/props/office/lamp.png
+  - ~ public/props/office/rug.png
+  - + public/props/office/trash.png
+  - + public/props/office/coffee-mug.png
+  - + public/props/office/book-stack.png
+  - + public/props/office/nameplate.png
+  - + public/props/office/raw/
+  - + public/props/office/extracted-large/
+  - + public/props/office/extracted-small/
+  - ~ src/content/maps/office.json
+  - ~ codex-prompts/028-office-redo-full-pipeline.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; pnpm/corepack unavailable per AGENTS.md, deferred to Claude)
+  - lint: n/a (not requested; no runnable package manager in sandbox)
+  - dev server boot: n/a (sandbox)
+  - json parse: pass (`python3 -m json.tool src/content/maps/office.json`)
+  - collision path: pass (BFS path from spawn `(7,5)` to trigger `(8,1)`)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/office-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: clean warm wood office interior with continuous plank floor, dark wood walls, no furniture/props/characters/text; one dark doorway visible on the top wall.
+     - top-wall darkness scan in x=160..360, y=6..48 found doorway dark runs `245..253` and `270..285`; combined visual doorway center about `x=265`, so `door_col=8`.
+  2. Step 2 dressed reference:
+     - `public/maps/office-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image placement matrix from observed dressed reference:
+       - desk: upper-left, starts around `(col 2, row 2)`, about 4 tiles wide x 2 tiles tall.
+       - chair: black office chair directly below desk at `(col 3, row 4)`.
+       - bookshelf: lower-left wall at `(col 1, row 6)`, about 2 tiles wide and 2.5 tiles tall.
+       - door: closed wooden door at top wall doorway `(col 8, row 0)`.
+       - phone: black phone on desk at `(col 3, row 2)`.
+       - paper: paper stack on desk at `(col 4, row 2)`.
+       - plant: potted plant on right side at `(col 11, row 2)`.
+       - lamp: brass desk lamp on desk at `(col 2, row 2)`.
+       - rug: red rug in center floor at `(col 5, row 5)`.
+       - trash: black trash bin near right wall at `(col 12, row 5)`.
+       - coffee-mug: white mug on desk at `(col 5, row 3)`.
+       - book-stack: book stack on bookshelf at `(col 1, row 6)`.
+       - nameplate: wooden nameplate right of door at `(col 9, row 1)`.
+  3. Step 3 large props one-by-one:
+     - `desk.png`: final size `(128,64)`, opaque-magenta-residue `0`, manifest `edge_touch=false`; view/contact sheet shows dark wooden office desk with drawers.
+     - `chair.png`: final size `(48,48)`, opaque-magenta-residue `0`, manifest `edge_touch=false`; view/contact sheet shows black swivel office chair.
+     - `bookshelf.png`: final size `(64,80)`, opaque-magenta-residue `0`, manifest `edge_touch=false`; view/contact sheet shows brown shelf with red/blue books.
+     - `door.png`: final size `(32,48)`, opaque-magenta-residue `0`, manifest `edge_touch=false`; view/contact sheet shows closed wooden door with brass handle.
+  4. Step 4 small prop pack 3x3:
+     - Raw pack view_image row 1: black office phone, paper stack, potted plant; row 2: brass lamp, red rug, black trash bin; row 3: coffee mug, stacked books, blank wooden nameplate.
+     - Extracted finals all have manifest `edge_touch=false` and residue `0`: `phone.png (28,28)`, `paper.png (28,28)`, `plant.png (48,48)`, `lamp.png (28,40)`, `rug.png (96,48)`, `trash.png (32,48)`, `coffee-mug.png (24,24)`, `book-stack.png (32,28)`, `nameplate.png (48,24)`.
+  5. Step 5 alpha clean assertions:
+     - Opaque-magenta-residue check passed for all 13 props with count `0` each, below required `< 50`.
+     - Runtime direct PNG alpha bboxes after transparent padding do not touch image edges: desk `(4,4,124,60)`, chair `(3,3,45,45)`, bookshelf `(4,4,60,76)`, door `(3,3,29,45)`, phone `(2,2,26,26)`, paper `(2,2,26,26)`, plant `(3,3,45,45)`, lamp `(2,2,26,38)`, rug `(3,3,93,45)`, trash `(3,3,29,45)`, coffee-mug `(2,2,22,22)`, book-stack `(2,2,30,26)`, nameplate `(2,2,46,22)`.
+  6. Step 6 office.json:
+     - `json.tool` parse passed; map id `office`, tileSize `32`, size `14x10`, baseUrl `/maps/office-base.png`.
+     - Props in JSON: desk `(2,2)` size `(128,64)` collision `{x:2,y:2,w:4,h:2}`; lamp `(2,2)`; phone `(3,2)`; paper `(4,2)`; coffee-mug `(5,3)`; chair `(3,4)` size `(48,48)` collision `{x:3,y:4,w:1,h:1}`; bookshelf `(1,6)` size `(64,80)` collision `{x:1,y:6,w:2,h:3}`; book-stack `(1,6)`; door `(8,0)`; nameplate `(9,1)`; plant `(11,2)` collision `{x:12,y:3,w:1,h:1}`; trash `(12,5)` collision `{x:12,y:5,w:1,h:1}`; rug `(5,5)`.
+     - Collision matrix:
+       - `[true,true,true,true,true,true,true,true,true,true,true,true,true,true]`
+       - `[true,false,false,false,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,false,true,true,true,true,false,false,false,false,false,false,false,true]`
+       - `[true,false,true,true,true,true,false,false,false,false,false,false,true,true]`
+       - `[true,false,false,true,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,false,false,false,false,false,false,false,false,false,false,false,true,true]`
+       - `[true,true,true,false,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,true,true,false,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,true,true,false,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,true,true,true,true,true,true,true,true,true,true,true,true,true]`
+     - Spawn `(7,5)` walkable=true; trigger `(8,1)` walkable=true; BFS path `[(7,5),(8,5),(8,4),(8,3),(8,2),(8,1)]`.
+  7. Step 7 layered preview:
+     - `public/maps/office-layered-preview.png`: Pillow size `(448,320)`, mode `RGBA`.
+     - view_image: preview shows base plus props aligned to dressed reference: desk/chair upper-left, bookshelf lower-left, red rug centered, plant and trash on right, door over top doorway at col 8, no visible magenta residue.
+  8. Step 8 typecheck/build:
+     - `pnpm typecheck` and `pnpm build`: deferred to Claude / n/a (sandbox) per AGENTS.md because package-manager execution is unavailable in this Codex companion environment.
+- **Notes**:
+  - Ran the required full layered_raster pipeline: base, dressed reference, 4 one-by-one large props, 9-prop 3x3 pack, chroma-key cleanup with `--soft-matte --despill`, `extract_prop_pack.py --reject-edge-touch`, office JSON with collision/path verification, and composed QA preview.
+  - Final direct prop PNGs were resized with transparent padding from extracted assets so runtime top-left rendering has stable visual scale and no magenta edge residue.
+- **BLOCKER**: none
+- **Decisions made**:
+  - Used measured `door_col=8` instead of prompt example `10`; trigger is `{x:8,y:1}` and BFS verifies reachability.
+  - Used `anchor: top-left` only in the temporary compose placements to match the existing React renderer, which positions props by `left: prop.x * tileSize` and `top: prop.y * tileSize`.
+
 ## 2026-04-30 10:38 — codex-prompt 018 protagonist-identity-fix
 
 - **STATUS**: ready-for-commit
