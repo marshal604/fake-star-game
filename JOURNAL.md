@@ -28,6 +28,81 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 02:28 — codex-prompt 030 obo-scene-full-pipeline
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + public/maps/obo-base.png
+  - + public/maps/obo-dressed-reference.png
+  - + public/maps/obo-layered-preview.png
+  - + public/backgrounds/obo.png
+  - + public/props/obo/escalator.png
+  - + public/props/obo/fountain.png
+  - + public/props/obo/kiosk.png
+  - + public/props/obo/vending-machine.png
+  - + public/props/obo/bench.png
+  - + public/props/obo/plant.png
+  - + public/props/obo/trash-bin.png
+  - + public/props/obo/info-board.png
+  - + public/props/obo/sign.png
+  - + public/props/obo/arcade-machine.png
+  - + public/props/obo/phone-booth.png
+  - + public/props/obo/coke-can.png
+  - + public/props/obo/shopping-bag.png
+  - + public/props/obo/coupon.png
+  - + src/content/maps/obo.json
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - ~ src/content/scenes.ts
+  - ~ src/content/events/index.ts
+  - ~ codex-prompts/030-obo-scene-full-pipeline.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck && pnpm build` failed before scripts with corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`, deferred to Claude)
+  - lint: n/a (not requested; package manager unavailable in sandbox)
+  - dev server boot: n/a (sandbox)
+  - json parse: pass (`python3 -m json.tool src/content/maps/obo.json`)
+  - image assertions: pass (Pillow size/mode checks and prop residue assertions)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/obo-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: clean bright top-down mall atrium shell with glass side/top walls, polished tile floor, neon wall detail, no furniture/props/characters; bottom-center dark entry doorway is visible.
+     - Pillow bottom-strip scan: full-width strip had dark side wall corners, so the doorway scan used the lower doorway band `y=296..320` excluding outer wall columns; cols `6` and `7` were darkest (`98.4`, `99.0`), so `door_col=6`.
+  2. Step 2 dressed reference:
+     - `public/maps/obo-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image prop matrix from observed dressed reference:
+       - escalator: right side, around `(col 10, row 2)`, 3x2, diagonal upward.
+       - fountain: center, around `(col 6, row 4)`, 2x2.
+       - kiosk: upper-left, around `(col 2, row 2)`, 2x1.
+       - vending-machine: left wall, around `(col 1, row 4)`, 1x2.
+       - bench-left / bench-right: flanking fountain at `(col 4, row 6)` and `(col 8, row 6)`, each 2x1.
+       - plants: upper-left corner `(col 1, row 1)` and lower-right `(col 12, row 7)`.
+       - trash-bin: near entry, around `(col 5, row 8)`.
+       - info-board: upper-right middle, around `(col 9, row 2)`.
+       - sign: hanging from top center, around `(col 6, row 1)`.
+       - arcade-machine: right lower side, around `(col 10, row 6)`.
+       - phone-booth: left-lower red booth-like prop, around `(col 2, row 6)`.
+       - shopping-bag / coke-can / coupon: lower center at `(col 6,row 7)`, `(col 7,row 7)`, `(col 8,row 7)`.
+  3. Steps 3-5 prop generation and alpha verification:
+     - 5 large one-by-one props after `remove_chroma_key.py --soft-matte --despill` and `extract_prop_pack.py --reject-edge-touch`: `escalator.png (96,64) residue 0 edge_touch false`, `fountain.png (64,64) residue 0 edge_touch false`, `kiosk.png (64,32) residue 0 edge_touch false`, `vending-machine.png (32,64) residue 0 edge_touch false`, `bench.png (64,32) residue 0 edge_touch false`.
+     - 9 small prop_pack props after the same chroma-key cleanup: `plant.png (40,48) residue 0 edge_touch false`, `trash-bin.png (32,40) residue 0 edge_touch false`, `info-board.png (40,48) residue 0 edge_touch false`, `sign.png (32,48) residue 0 edge_touch false`, `arcade-machine.png (40,48) residue 0 edge_touch false`, `phone-booth.png (40,64) residue 0 edge_touch false`, `coke-can.png (24,24) residue 0 edge_touch false`, `shopping-bag.png (28,32) residue 0 edge_touch false`, `coupon.png (28,20) residue 0 edge_touch false`.
+     - view_image contact-sheet observation of final props: escalator is silver/black diagonal mall escalator; fountain is blue-water stone basin; kiosk is curved counter; vending machine is red/blue; bench is wood/metal; plant is potted green plant; trash-bin is gray bin; info-board is blue digital stand; sign is vertical hanging sign; arcade-machine is black cabinet; phone-booth is red phone kiosk; coke-can is red can; shopping-bag is brown paper bag; coupon is a small flyer. No visible magenta background in the composited check.
+  4. Step 6 VN background:
+     - `public/backgrounds/obo.png`: Pillow size `(1920, 1080)`, mode `RGB`, file size `1,356,979` bytes (`< 1.5 MB`).
+     - view_image: bright multi-story mall lobby with glass skylight, polished floor, central fountain, kiosk/vending on left, arcade/info boards, visible escalator on right, and an uncluttered lower third for dialogue overlay.
+  5. Step 7 JSON and registrations:
+     - `src/content/maps/obo.json`: `json.tool` parse passed; id `obo`, name `歐堡娛樂城`, `tileSize=32`, size `14x10`, `baseUrl=/maps/obo-base.png`, `props.length=16` placements using 14 unique prop PNGs.
+     - Collision uses wall union plus prop bbox union; bottom doorway keeps `(6,9)` and `(7,9)` open. Verified spawn `(6,8)` walkable=true and trigger `(6,9)` walkable=true.
+     - Trigger is `{ id: "obo.exit", x: 6, y: 9, eventId: "obo-exit-stub", autoFire: false }`; player spawn is `{ x: 6, y: 8, facing: "up" }`.
+     - React diff verified: `TilemapScene.tsx` imports/registers `oboMap`; `scenes.ts` adds `obo: { backgroundUrl: '/backgrounds/obo.png' }`; `events/index.ts` adds `obo-exit-stub` ending with `(歐堡娛樂城劇情即將開放)`.
+  6. Step 8 preview and build:
+     - `public/maps/obo-layered-preview.png`: Pillow size `(448, 320)`, mode `RGBA`.
+     - view_image: preview shows clean mall base with layered props aligned to the dressed reference: upper-left plant/kiosk, top-center hanging sign, right-side info board/escalator, left vending and phone booth, central fountain, two benches, arcade machine, entry trash bin, and lower-center bag/can/coupon. No visible magenta residue.
+     - `pnpm typecheck && pnpm build`: deferred to Claude / n/a (sandbox) because corepack cannot write `/Users/hubert/.cache/node/corepack/lastKnownGood.json`.
+- **Notes**: Ran the requested 8-step layered_raster pipeline for obo only. Did not modify office, orphanage, portraits, or sprites. Temporary raw/extraction files were removed after final PNGs and verification.
+- **BLOCKER**: none
+- **Decisions made**: `door_col=6` uses the centered doorway darkness scan, ignoring darker side-wall corner columns. Runtime JSON has 16 prop placements because benches and plants are duplicated while the deliverable set has 14 unique prop PNG files.
+
 ---
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)

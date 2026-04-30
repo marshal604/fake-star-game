@@ -1,0 +1,403 @@
+{
+  "id": "obo",
+  "name": "歐堡娛樂城",
+  "tileSize": 32,
+  "width": 14,
+  "height": 10,
+  "baseUrl": "/maps/obo-base.png",
+  "props": [
+    {
+      "id": "kiosk",
+      "url": "/props/obo/kiosk.png",
+      "x": 2,
+      "y": 2,
+      "z": 3,
+      "collision": {
+        "x": 2,
+        "y": 2,
+        "w": 2,
+        "h": 1
+      }
+    },
+    {
+      "id": "sign",
+      "url": "/props/obo/sign.png",
+      "x": 6,
+      "y": 1,
+      "z": 3,
+      "collision": {
+        "x": 6,
+        "y": 1,
+        "w": 1,
+        "h": 2
+      }
+    },
+    {
+      "id": "info-board",
+      "url": "/props/obo/info-board.png",
+      "x": 9,
+      "y": 2,
+      "z": 3,
+      "collision": {
+        "x": 9,
+        "y": 2,
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "escalator",
+      "url": "/props/obo/escalator.png",
+      "x": 10,
+      "y": 2,
+      "z": 4,
+      "collision": {
+        "x": 10,
+        "y": 2,
+        "w": 3,
+        "h": 2
+      }
+    },
+    {
+      "id": "vending-machine",
+      "url": "/props/obo/vending-machine.png",
+      "x": 1,
+      "y": 4,
+      "z": 5,
+      "collision": {
+        "x": 1,
+        "y": 4,
+        "w": 1,
+        "h": 2
+      }
+    },
+    {
+      "id": "fountain",
+      "url": "/props/obo/fountain.png",
+      "x": 6,
+      "y": 4,
+      "z": 5,
+      "collision": {
+        "x": 6,
+        "y": 4,
+        "w": 2,
+        "h": 2
+      }
+    },
+    {
+      "id": "bench-left",
+      "url": "/props/obo/bench.png",
+      "x": 4,
+      "y": 6,
+      "z": 6,
+      "collision": {
+        "x": 4,
+        "y": 6,
+        "w": 2,
+        "h": 1
+      }
+    },
+    {
+      "id": "bench-right",
+      "url": "/props/obo/bench.png",
+      "x": 8,
+      "y": 6,
+      "z": 6,
+      "collision": {
+        "x": 8,
+        "y": 6,
+        "w": 2,
+        "h": 1
+      }
+    },
+    {
+      "id": "arcade-machine",
+      "url": "/props/obo/arcade-machine.png",
+      "x": 10,
+      "y": 6,
+      "z": 7,
+      "collision": {
+        "x": 10,
+        "y": 6,
+        "w": 2,
+        "h": 1
+      }
+    },
+    {
+      "id": "phone-booth",
+      "url": "/props/obo/phone-booth.png",
+      "x": 2,
+      "y": 6,
+      "z": 7,
+      "collision": {
+        "x": 2,
+        "y": 6,
+        "w": 1,
+        "h": 2
+      }
+    },
+    {
+      "id": "plant-upper-left",
+      "url": "/props/obo/plant.png",
+      "x": 1,
+      "y": 1,
+      "z": 2,
+      "collision": {
+        "x": 1,
+        "y": 1,
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "plant-lower-right",
+      "url": "/props/obo/plant.png",
+      "x": 12,
+      "y": 7,
+      "z": 8,
+      "collision": {
+        "x": 12,
+        "y": 7,
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "trash-bin",
+      "url": "/props/obo/trash-bin.png",
+      "x": 5,
+      "y": 8,
+      "z": 9,
+      "collision": {
+        "x": 5,
+        "y": 8,
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "shopping-bag",
+      "url": "/props/obo/shopping-bag.png",
+      "x": 6,
+      "y": 7,
+      "z": 8,
+      "collision": {
+        "x": 6,
+        "y": 7,
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "coke-can",
+      "url": "/props/obo/coke-can.png",
+      "x": 7,
+      "y": 7,
+      "z": 8,
+      "collision": {
+        "x": 7,
+        "y": 7,
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "coupon",
+      "url": "/props/obo/coupon.png",
+      "x": 8,
+      "y": 7,
+      "z": 8,
+      "collision": {
+        "x": 8,
+        "y": 7,
+        "w": 1,
+        "h": 1
+      }
+    }
+  ],
+  "tilesetUrl": "/maps/obo-base.png",
+  "tilesetCols": 1,
+  "tilesetRows": 1,
+  "layers": {
+    "ground": [],
+    "objects": []
+  },
+  "collision": [
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  ],
+  "triggers": [
+    {
+      "id": "obo.exit",
+      "x": 6,
+      "y": 9,
+      "eventId": "obo-exit-stub",
+      "autoFire": false
+    }
+  ],
+  "spawns": {
+    "player": {
+      "x": 6,
+      "y": 8,
+      "facing": "up"
+    }
+  }
+}
