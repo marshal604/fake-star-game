@@ -32,6 +32,57 @@
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)
 
+## 2026-04-30 10:38 — codex-prompt 018 protagonist-identity-fix
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/suman.png
+  - ~ public/portraits/suman-normal.png
+  - ~ public/portraits/protagonist-normal.png
+  - ~ codex-prompts/018-protagonist-identity-fix.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (image-only task)
+  - lint: n/a (image-only task)
+  - dev server boot: n/a (sandbox)
+  - sprite bbox check: pass; protagonist and suman per-frame bbox exactly match chenyifu
+  - boundary cleanup check: pass; internal row boundary y=47/48/49, 95/96/97, 143/144/145 alpha_sum=0 for both regenerated sprites
+  - portrait trim check: pass; remaining 4-neighbor near-white edge pixels are 0 for suman and protagonist
+- **Verified output**:
+  1. Task A VN portrait colors from view_image:
+     - protagonist-normal.png: adult male with vibrant blue spiky hair, dark gray suit jacket and pants, white shirt, and blue tie with pale diagonal stripes; no black hair and no red tie visible.
+     - suman-normal.png: young woman with dark pink/magenta hair in side buns/braids and loose curls, black-frame glasses, red sleeveless top with a white star, blue jeans, pale belt with heart buckle, chain, and red/white/teal wristband.
+  2. Task B/C regenerated sprite view_image row colors:
+     - protagonist.png row 0: back view, no face, blue hair clearly visible above dark gray suit.
+     - protagonist.png row 1: side view facing right, blue hair on the right-facing head, dark gray suit, blue tie edge visible.
+     - protagonist.png row 2: front view, blue spiky hair, gray suit jacket, white shirt, and blue striped tie visible.
+     - protagonist.png row 3: side view facing left, blue hair on the left-facing head, dark gray suit visible.
+     - suman.png row 0: back view, magenta twin-bun/braid hair, red top back, blue jeans visible.
+     - suman.png row 1: side view facing right, dark pink/magenta hair, red sleeveless top, blue jeans, black glasses visible.
+     - suman.png row 2: front view, dark pink/magenta hair, black glasses, red sleeveless top with light star mark, and blue jeans visible.
+     - suman.png row 3: side view facing left, dark pink/magenta hair, red top, blue jeans visible.
+  3. Task B/C bbox matrix vs chenyifu, measured per 32x48 frame as (x0,y0,x1,y1,w,h):
+     - chenyifu row 0: [(7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37)]
+     - chenyifu row 1: [(7,12,23,45,17,34), (7,12,23,45,17,34), (8,12,23,45,16,34), (7,12,23,45,17,34)]
+     - chenyifu row 2: [(7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37)]
+     - chenyifu row 3: [(7,11,24,45,18,35), (7,11,23,45,17,35), (7,11,23,45,17,35), (7,11,23,45,17,35)]
+     - protagonist row 0: [(7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37)]; delta vs chenyifu all 0
+     - protagonist row 1: [(7,12,23,45,17,34), (7,12,23,45,17,34), (8,12,23,45,16,34), (7,12,23,45,17,34)]; delta vs chenyifu all 0
+     - protagonist row 2: [(7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37), (7,9,23,45,17,37)]; delta vs chenyifu all 0
+     - protagonist row 3: [(7,11,24,45,18,35), (7,11,23,45,17,35), (7,11,23,45,17,35), (7,11,23,45,17,35)]; delta vs chenyifu all 0
+     - suman rows 0..3: identical bbox matrices to chenyifu; delta vs chenyifu all 0
+  4. Task D boundary cleanup and bottom y:
+     - protagonist.png: bottom y per row/frame is 45 for all 16 frames, so bottom y >= 43; row-boundary alpha_sum at y=47/48/49, 95/96/97, 143/144/145 is 0; transparent RGB nonzero count 0.
+     - suman.png: bottom y per row/frame is 45 for all 16 frames, so bottom y >= 43; row-boundary alpha_sum at y=47/48/49, 95/96/97, 143/144/145 is 0; transparent RGB nonzero count 0.
+  5. Task E portrait trim:
+     - suman-normal.png: trim_white_outline removed 2330 pixels on the first pass and 173 additional pixels on repeated same-method cleanup, total trimmed=2503; post-trim remaining near-white edge pixels=0 and transparent RGB nonzero count=0. view_image shows the outer halo removed against black/transparent background with no visible holes or large missing areas; internal white star and hair curl highlights remain.
+     - protagonist-normal.png: trim_white_outline removed 0 pixels; post-trim remaining near-white edge pixels=0 and transparent RGB nonzero count=0. view_image still shows blue hair, gray suit, white shirt, and blue striped tie with no new holes or missing areas.
+- **Notes**: Used $generate2dsprite workflow with image_gen raw sheets, then Pillow/numpy postprocessing to chroma-key magenta, resize to 128x192, fit each frame to the chenyifu bbox anchors, clear only internal row boundaries by +/-1 px, and zero RGB for alpha=0 pixels. `public/sprites/chenyifu.png`, `public/portraits/chenyifu-normal.png`, map files, and React files were not modified. Generated raw images remain under `/Users/hubert/.codex/generated_images/019ddc39-d838-74f1-a4f5-2d22443f96ec/`.
+- **BLOCKER**: none
+- **Decisions made**: Repeated the exact same conservative `trim_white_outline()` method on suman until remaining near-white edge pixels reached 0, because the first pass exposed 173 additional edge pixels; no lower threshold or broader mask was used.
+
 ## 2026-04-30 09:59 — codex-prompt 015 sprite-anchor-align-and-suman-portrait-alpha
 
 - **STATUS**: ready-for-commit
