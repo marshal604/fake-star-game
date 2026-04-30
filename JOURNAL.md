@@ -303,3 +303,36 @@
 - **Notes**: Fixed sprite frame rendering to use 32x48 frames with feet-anchored positioning, tightened tile grid/cell styles to remove seams, and added integer viewport scale recalculation on load and resize. Did not regenerate assets, modify `office.json`, add NPC walking animation, or add dependencies.
 - **BLOCKER**: none
 - **Decisions made**: Used the prompt-requested React absolute sprite overlays and CSS grid seam fix path rather than converting tile rendering to canvas.
+
+## 2026-04-30 09:36 — codex-prompt 014 regenerate-protagonist-and-suman-sprites
+
+- **STATUS**: done
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/suman.png
+  - ~ JOURNAL.md
+  - ~ codex-prompts/014-regenerate-protagonist-and-suman-sprites.md
+- **Self-check**:
+  - typecheck: n/a (sprite-only image generation)
+  - lint: n/a (sprite-only image generation)
+  - dev server boot: n/a (sandbox)
+  - image size: pass; protagonist.png and suman.png are 128x192 RGBA PNGs
+  - row bleed alpha check: pass; boundary strips at rows 47/48, 95/96, and 143/144 have max alpha 0 in both regenerated sheets
+- **Verified output**:
+  - `public/sprites/protagonist.png` view_image after generation attempt 1 and Pillow row-bleed cleanup:
+    - row 0: character is seen from behind, with blue hair/back of gray suit visible and no face; matches up/back.
+    - row 1: side view with face and blue hair front on the right side of the frame; matches right.
+    - row 2: character faces forward, with face, gray suit front, white shirt, and blue tie visible; matches down/front.
+    - row 3: side view with face and blue hair front on the left side of the frame; matches left.
+    - regeneration attempts: 1.
+  - `public/sprites/suman.png` view_image after generation attempt 1 and Pillow row-bleed cleanup:
+    - row 0: character is seen from behind, with magenta hair/back of coral top and jeans visible and no face; matches up/back.
+    - row 1: side view with glasses/face and magenta hair front on the right side of the frame; matches right.
+    - row 2: character faces forward, with glasses, magenta hair, coral star top, jeans, and belt visible; matches down/front.
+    - row 3: side view with glasses/face and magenta hair front on the left side of the frame; matches left.
+    - regeneration attempts: 1.
+  - `public/sprites/chenyifu.png` was view_image inspected only as the row-order anchor: row 0 back/no face, row 1 right-facing side view, row 2 front/face visible, row 3 left-facing side view. It was not modified.
+- **Notes**: Regenerated protagonist and suman with `$generate2dsprite` prompt constraints using the VN portraits as identity references and chenyifu only as row-order anchor. Converted the raw 4x4 magenta sheets to the required 32x48 cell, 128x192 transparent RGBA project sheets, then applied the exact prompt-provided Pillow `clean_row_bleed` code to protagonist.png and suman.png.
+- **BLOCKER**: none
+- **Decisions made**: The bundled generate2dsprite processor CLI only accepts square `--cell-size`, so rectangular 32x48 repacking was done mechanically with Pillow while preserving the skill's magenta-key workflow and the prompt's exact row-bleed cleanup snippet.
