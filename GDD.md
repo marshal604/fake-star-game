@@ -176,18 +176,74 @@ type GameMode =
 - `vn` → `tilemap`:事件 graph 走到 `{ type: 'returnToMap'; mapId, x, y }` node
 - `vn` / `tilemap` → `end`:事件 graph 走到 `{ type: 'end' }` node
 
-### 6.1 Tilemap 系統(v0.1)
+### 6.1 Tilemap 系統(v0.1 baked_raster / v0.2+ layered_raster)
 
-最小可動實作(用 React + Canvas 或純 React 都可,由 Codex 決定):
+#### v0.1 現況(baked_raster)
 
-- `src/components/Tilemap/TilemapScene.tsx`:讀 `office.json`,render tile grid
-- `src/components/Tilemap/PlayerSprite.tsx`:讀方向鍵 / WASD,管理位置 + 朝向 + 動畫 frame
-- `src/core/tilemap.ts`:carry 邏輯(collision check、tile-at、trigger-at、neighbour-walkable)
-- `src/content/maps/office.json`:tile grid + collision layer + trigger 列表
+`office` 場景用 `$generate2dmap baked_raster` pipeline 生整張 448×320 圖(`public/maps/office-tilemap.png`),React 用一個 `<img>` 鋪滿 stage。
 
-碰撞:每張 map 有一個 `collision` 2D array,`true` 表示不可走。Player 移動前檢查目的地。
+**問題**:image_gen 內部物件位置自由發揮,不嚴格對齊 14×10 grid。collision 跟 trigger 要 Pillow 量圖手動 align(prompt 022 已做過一次)。新增物件 / 改動牆位都要重生整張 + 重 align。
 
-觸發:每張 map 有一個 `triggers` 列表 `{ x, y, eventId, autoFire?: boolean }`。autoFire = true 表示走到該 tile 自動觸發(門);否則需玩家按互動鍵(空白 / E)。
+#### v0.2+ 後續場景(layered_raster — 官方推薦)
+
+從 `育幼院 / pub / 片場 / 歐堡 ...` 起,所有新場景用 `$generate2dmap layered_raster` pipeline:
+
+1. **Base map**:整片 ground only(地板 + 牆,沒物件)— `public/maps/<scene>-base.png`
+2. **Dressed reference**(planning only):skill 內部用,不 commit
+3. **Prop pack**:各物件獨立 transparent PNG — `public/props/<scene>/<prop>.png`(桌、椅、書櫃、門、燈、盆栽 etc)
+4. **Placement metadata**:每個 prop 在 map 上的 (x, y, layer) 寫進 `<scene>.json`
+5. **Collision**:從 prop bbox 自動推導 + 手動補強(門洞、窄通道)
+
+#### Schema(v0.2 起 TilemapData 擴充)
+
+```ts
+export interface TilemapData {
+  id: string;
+  name: string;
+  tileSize: number;
+  width: number;
+  height: number;
+  baseUrl: string;                  // 必填(layered 的 ground)
+  props?: Array<{
+    id: string;                     // 'desk-1', 'door-main', etc
+    url: string;                    // /props/office/desk.png
+    x: number;                      // 左上角 in tile coords
+    y: number;
+    z?: number;                     // y-sort hint;不填用 y
+    collision?: { x: number; y: number; w: number; h: number };  // tile bbox
+  }>;
+  collision: boolean[][];           // 仍保留,base 牆 + prop collision 合併
+  triggers: Array<{ id: string; x: number; y: number; eventId: string; autoFire?: boolean }>;
+  spawns: { player: { x: number; y: number; facing: Facing } };
+
+  // legacy v0.1 baked_raster fields (optional, only office uses these)
+  tilesetUrl?: string;
+  tilesetCols?: number;
+  tilesetRows?: number;
+  layers?: { ground: number[][]; objects: number[][] };
+}
+```
+
+#### Render 規則(v0.2+)
+
+`TilemapScene.tsx` 偵測:
+- 有 `props` 欄位 → layered_raster mode:
+  1. render `<img src={baseUrl}>` 鋪滿 stage(z-0)
+  2. render 每個 prop `<img src={prop.url} style={{ position: absolute, left: prop.x*tileSize, top: prop.y*tileSize, zIndex: prop.z ?? prop.y }}>`(y-sort)
+  3. render player + npc sprite(z-sort 跟 props 混排,角色站 prop 後面被擋)
+- 沒 `props` 欄位 → fallback baked_raster(office 走這條,維持目前行為)
+
+#### Migration 決策(office 是否 retroactive)
+
+兩條路:
+- **A. forward-only**(推薦):office 維持 baked_raster(已 work),v0.2 新場景全走 layered。每個 layered 場景的 prompt 直接生 base + prop pack + JSON 一次到位。
+- **B. retroactive**(office 也轉 layered):重生 office-base.png + 拆出 desk/chair/bookshelf/door 個別 prop,改 office.json schema,重做 collision align。風險高,但 codebase 統一。
+
+**現定 A**(forward-only)。office 是「已知能跑的 baseline」,動它 risk 大。新場景的 layered 寫法成熟後,如果有需要再回頭遷 office。
+
+碰撞:`collision` 2D array `true` = 不可走。layered_raster mode 下,collision 由 base 牆(prompt 強調 base 圖只畫地板,牆位置寫進 collision)+ 各 prop 的 collision bbox 合併計算。
+
+觸發:`triggers` 列表 `{ x, y, eventId, autoFire?: boolean }` 不變。
 
 ### 6.2 事件引擎(v0.1: 手寫 state machine)
 
