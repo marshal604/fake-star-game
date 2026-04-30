@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import officeMap from '~/content/maps/office.json';
+import orphanageMap from '~/content/maps/orphanage.json';
 import { findTrigger, neighbour } from '~/core/tilemap';
 import type { TilemapData } from '~/core/types';
 import { useGameStore } from '~/store/gameStore';
@@ -9,6 +10,7 @@ import { PlayerSprite } from './PlayerSprite';
 
 const MAPS: Record<string, TilemapData> = {
   office: officeMap as TilemapData,
+  orphanage: orphanageMap as TilemapData,
 };
 
 interface TilemapSceneProps {

@@ -138,6 +138,59 @@ index 571e921..407a87b 100644
 - **BLOCKER**: none
 - **Decisions made**: none
      - protagonist-normal.png: trim_white_outline removed 0 pixels; post-trim remaining near-white edge pixels=0 and transparent RGB nonzero count=0. view_image still shows blue hair, gray suit, white shirt, and blue striped tie with no new holes or missing areas.
+
+## 2026-05-01 01:14 — codex-prompt 026 orphanage-scene
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + public/maps/orphanage-base.png
+  - + public/props/orphanage/bed.png
+  - + public/props/orphanage/toy.png
+  - + public/props/orphanage/blackboard.png
+  - + public/props/orphanage/table.png
+  - + public/props/orphanage/small-chair.png
+  - + public/props/orphanage/bookshelf.png
+  - + public/props/orphanage/christmas-tree.png
+  - + public/props/orphanage/plant.png
+  - + public/props/orphanage/door.png
+  - + public/backgrounds/orphanage.png
+  - + src/content/maps/orphanage.json
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - ~ src/content/scenes.ts
+  - ~ src/content/events/index.ts
+  - ~ codex-prompts/026-orphanage-scene.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: pass (`./node_modules/.bin/tsc --noEmit`)
+  - lint: n/a
+  - dev server boot: n/a
+  - build: pass (`./node_modules/.bin/tsc -b` + `./node_modules/.bin/vite build`)
+- **Verified output**:
+  1. `public/maps/orphanage-base.png`: Pillow size=(448, 320), mode=RGB, bytes=186033. `view_image` shows a bare top-down orphanage room shell: cream/yellow walls on all sides, two small square windows on the top wall, continuous warm wooden plank floor, and a dark doorway opening at the bottom center. No beds, toys, tables, chairs, plants, blackboard, shelves, rugs, characters, or loose props are visible.
+  2. `public/props/orphanage/*.png`: all 9 prop files are RGBA with transparency and `edge_touch=false`.
+     - bed.png size=(64,64), bytes=5873: blue-blanket wooden bed centered with transparent padding.
+     - toy.png size=(32,32), bytes=2481: wooden toy chest with colorful toys, transparent padding.
+     - blackboard.png size=(64,32), bytes=2218: small chalkboard on wooden stand, transparent padding.
+     - table.png size=(64,32), bytes=1380: low wooden table, transparent padding.
+     - small-chair.png size=(32,32), bytes=1471: small chair, transparent padding.
+     - bookshelf.png size=(64,64), bytes=8012: short bookshelf with colorful books, transparent padding.
+     - christmas-tree.png size=(64,64), bytes=6399: decorated tree with ornaments and star, transparent padding.
+     - plant.png size=(32,32), bytes=1987: potted green plant, transparent padding.
+     - door.png size=(32,32), bytes=1458: open wooden door, transparent padding.
+  3. `public/backgrounds/orphanage.png`: Pillow size=(1920, 1080), mode=P, no alpha channel, bytes=836337 (<1.5 MB). `view_image` shows a clean-HD orphanage common room with beds along the side walls, low tables/chairs, chalkboard, toys, warm windows, pastel worn walls, no characters, and a visually clean lower third for dialogue UI.
+  4. `src/content/maps/orphanage.json`: `python3 -m json.tool` passed. Parsed key fields: id=`orphanage`, name=`育幼院`, tileSize=32, width=14, height=10, baseUrl=`/maps/orphanage-base.png`, props count=9, collision rows=10 with 14 columns each, trigger id=`orphanage.exit`, eventId=`orphanage-exit-stub`, autoFire=false, spawn player=(6,8) facing up.
+  5. Code diff verification:
+     - `src/components/Tilemap/TilemapScene.tsx`: added `import orphanageMap from '~/content/maps/orphanage.json';` and `orphanage: orphanageMap as TilemapData` to `MAPS`.
+     - `src/content/scenes.ts`: added `orphanage: { backgroundUrl: '/backgrounds/orphanage.png' }` to `SCENES`.
+     - `src/content/events/index.ts`: added `orphanageExitStub` with end reason `(育幼院線即將開放,敬請期待 v0.3)` and registered `'orphanage-exit-stub': orphanageExitStub`; existing `sign-suman` entry remains.
+  6. Typecheck/build:
+     - `./node_modules/.bin/tsc --noEmit`: pass, no output.
+     - `./node_modules/.bin/tsc -b`: pass, no output.
+     - `./node_modules/.bin/vite build`: pass; output included `✓ 65 modules transformed` and `✓ built in 528ms`.
+- **Notes**: Generated the orphanage layered-raster assets with image generation first, then used Pillow only for resizing, chroma-key cleanup, prop extraction, and PNG size optimization. Did not modify office assets, portraits, sprites, sign-suman EventGraph, or React scene-switching logic.
+- **BLOCKER**: none
+- **Decisions made**: Used local `node_modules/.bin` binaries for typecheck/build instead of `pnpm` because AGENTS.md documents `pnpm` as sandbox-blocked; checks still exercised the same `tsc`/`vite` tools.
 - **Notes**: Used $generate2dsprite workflow with image_gen raw sheets, then Pillow/numpy postprocessing to chroma-key magenta, resize to 128x192, fit each frame to the chenyifu bbox anchors, clear only internal row boundaries by +/-1 px, and zero RGB for alpha=0 pixels. `public/sprites/chenyifu.png`, `public/portraits/chenyifu-normal.png`, map files, and React files were not modified. Generated raw images remain under `/Users/hubert/.codex/generated_images/019ddc39-d838-74f1-a4f5-2d22443f96ec/`.
 - **BLOCKER**: none
 - **Decisions made**: Repeated the exact same conservative `trim_white_outline()` method on suman until remaining near-white edge pixels reached 0, because the first pass exposed 173 additional edge pixels; no lower threshold or broader mask was used.

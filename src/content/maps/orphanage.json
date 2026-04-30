@@ -1,0 +1,41 @@
+{
+  "id": "orphanage",
+  "name": "育幼院",
+  "tileSize": 32,
+  "width": 14,
+  "height": 10,
+  "baseUrl": "/maps/orphanage-base.png",
+  "props": [
+    { "id": "bed1", "url": "/props/orphanage/bed.png", "x": 1, "y": 1, "collision": { "x": 1, "y": 1, "w": 2, "h": 2 } },
+    { "id": "bed2", "url": "/props/orphanage/bed.png", "x": 4, "y": 1, "collision": { "x": 4, "y": 1, "w": 2, "h": 2 } },
+    { "id": "table", "url": "/props/orphanage/table.png", "x": 7, "y": 4, "collision": { "x": 7, "y": 4, "w": 2, "h": 1 } },
+    { "id": "chair1", "url": "/props/orphanage/small-chair.png", "x": 7, "y": 5, "collision": { "x": 7, "y": 5, "w": 1, "h": 1 } },
+    { "id": "chair2", "url": "/props/orphanage/small-chair.png", "x": 9, "y": 5, "collision": { "x": 9, "y": 5, "w": 1, "h": 1 } },
+    { "id": "blackboard", "url": "/props/orphanage/blackboard.png", "x": 10, "y": 1, "collision": { "x": 10, "y": 1, "w": 2, "h": 1 } },
+    { "id": "bookshelf", "url": "/props/orphanage/bookshelf.png", "x": 1, "y": 7, "collision": { "x": 1, "y": 7, "w": 2, "h": 2 } },
+    { "id": "toy", "url": "/props/orphanage/toy.png", "x": 11, "y": 6 },
+    { "id": "plant", "url": "/props/orphanage/plant.png", "x": 12, "y": 7 }
+  ],
+  "tilesetUrl": "/maps/orphanage-base.png",
+  "tilesetCols": 1,
+  "tilesetRows": 1,
+  "layers": { "ground": [], "objects": [] },
+  "collision": [
+    [true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+    [true, true, true, false, true, true, false, false, false, false, true, true, false, true],
+    [true, true, true, false, true, true, false, false, false, false, false, false, false, true],
+    [true, false, false, false, false, false, false, false, false, false, false, false, false, true],
+    [true, false, false, false, false, false, false, true, true, false, false, false, false, true],
+    [true, false, false, false, false, false, false, true, false, true, false, false, false, true],
+    [true, false, false, false, false, false, false, false, false, false, false, false, false, true],
+    [true, true, true, false, false, false, false, false, false, false, false, false, false, true],
+    [true, true, true, false, false, false, false, false, false, false, false, false, false, true],
+    [true, true, true, true, true, true, false, false, true, true, true, true, true, true]
+  ],
+  "triggers": [
+    { "id": "orphanage.exit", "x": 6, "y": 9, "eventId": "orphanage-exit-stub", "autoFire": false }
+  ],
+  "spawns": {
+    "player": { "x": 6, "y": 8, "facing": "up" }
+  }
+}
