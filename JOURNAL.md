@@ -130,6 +130,54 @@
 - **BLOCKER**: none
 - **Decisions made**: none
 
+## 2026-04-30 10:24 — codex-prompt 017 uniform-widths-and-portrait-color-key
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/suman.png
+  - ~ codex-prompts/017-uniform-widths-and-portrait-color-key.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (Pillow/image-only task)
+  - lint: n/a (Pillow/image-only task)
+  - dev server boot: n/a (sandbox)
+  - sprite bbox verification: pass; protagonist and suman row width ranges are 0..1 px and row average width deltas from chenyifu are 0..0.25 px
+  - boundary cleanup: pass; rows 47/48, 95/96, and 143/144 alpha sums are 0 for protagonist and suman
+  - portrait flood-fill color-key: pass; operation ran with white_threshold=235 and found no connected edge white pixels remaining to clear
+- **Verified output**:
+  - Width matrix from Pillow alpha bbox, per row 4 frame widths:
+    - chenyifu target row 0: widths=[17,17,17,17], range=0
+    - chenyifu target row 1: widths=[17,17,16,17], range=1
+    - chenyifu target row 2: widths=[17,17,17,17], range=0
+    - chenyifu target row 3: widths=[18,17,17,17], range=1
+    - protagonist row 0: widths=[17,17,17,17], range=0, avg delta vs chenyifu=0
+    - protagonist row 1: widths=[17,17,17,17], range=0, avg delta vs chenyifu=+0.25
+    - protagonist row 2: widths=[17,17,17,17], range=0, avg delta vs chenyifu=0
+    - protagonist row 3: widths=[18,17,17,17], range=1, avg delta vs chenyifu=0
+    - suman row 0: widths=[17,17,17,17], range=0, avg delta vs chenyifu=0
+    - suman row 1: widths=[17,17,17,17], range=0, avg delta vs chenyifu=+0.25
+    - suman row 2: widths=[17,17,17,17], range=0, avg delta vs chenyifu=0
+    - suman row 3: widths=[18,17,17,17], range=1, avg delta vs chenyifu=0
+  - Height/bottom alignment from Pillow alpha bbox:
+    - chenyifu heights by row: row 0 [37,37,37,37], row 1 [34,34,34,34], row 2 [37,37,37,37], row 3 [35,35,35,35]; bottoms all [45,45,45,45]
+    - protagonist heights by row match chenyifu exactly: row 0 [37,37,37,37], row 1 [34,34,34,34], row 2 [37,37,37,37], row 3 [35,35,35,35]; bottoms all [45,45,45,45], delta=0
+    - suman heights by row match chenyifu exactly: row 0 [37,37,37,37], row 1 [34,34,34,34], row 2 [37,37,37,37], row 3 [35,35,35,35]; bottoms all [45,45,45,45], delta=0
+  - Boundary cleanup verification:
+    - protagonist.png boundary alpha sums after +/-1 cleanup: rows 47/48=0, rows 95/96=0, rows 143/144=0; measured per-frame bottom y remains 45, so bottom y >= 43.
+    - suman.png boundary alpha sums after +/-1 cleanup: rows 47/48=0, rows 95/96=0, rows 143/144=0; measured per-frame bottom y remains 45, so bottom y >= 43.
+  - view_image after sprite regeneration:
+    - protagonist.png: row 0 shows back view with dark hair and no face; row 1 shows right-facing side walk; row 2 shows front view with face, dark suit, shirt, and tie; row 3 shows left-facing side walk. All frames show one small suited adult male on transparent background.
+    - suman.png: row 0 shows back view with long pink hair and no face; row 1 shows right-facing side walk; row 2 shows front view with pink hair and pale pink outfit; row 3 shows left-facing side walk. All frames show one small young woman on transparent background.
+  - Portrait color-key result:
+    - flood-fill from edges with RGB threshold >=235 cleared 0 pixels because no connected opaque white edge pixels were present at execution time.
+    - Post-run Pillow stats: opaque_white_edge=0, opaque_white_total=23145, alpha0=986746, semi_alpha=0. The remaining white pixels are internal character/clothing/highlight pixels, not edge-connected background.
+    - suman-normal.png view_image after flood-fill shows Suman portrait on transparent/black background; the visible white star on shirt, belt/highlights, and skin/clothing highlights remain intact, with no edge-connected white background visible.
+- **Notes**: Generated one raw 4x4 sheet each for protagonist and suman using image_gen, then used Pillow/numpy to chroma-key magenta, keep the main component per frame, normalize each 32x48 frame to chenyifu's measured per-frame bbox, and save the transparent sheets. Ran only the requested +/-1 row boundary cleanup, not the old 8 px bottom clip. Flood-fill color-key was executed on `public/portraits/suman-normal.png`, but it produced no byte diff because there were 0 edge-connected opaque white pixels to clear. `public/sprites/chenyifu.png`, `public/portraits/protagonist-normal.png`, `public/portraits/chenyifu-normal.png`, React files, JSON files, and map files were not modified.
+- **BLOCKER**: none
+- **Decisions made**: none
+
 ## 2026-04-30 10:08 — codex-prompt 015 sprite-anchor-align-and-suman-portrait-alpha
 
 - **STATUS**: blocked
