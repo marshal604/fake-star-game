@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import officeMap from '~/content/maps/office.json';
 import { findTrigger, neighbour } from '~/core/tilemap';
@@ -27,6 +27,8 @@ function tileStyle(map: TilemapData, tileId: number): CSSProperties {
     backgroundRepeat: 'no-repeat',
     backgroundSize: `${map.tilesetCols * map.tileSize}px ${map.tilesetRows * map.tileSize}px`,
     backgroundPosition: `-${col * map.tileSize}px -${row * map.tileSize}px`,
+    backgroundClip: 'padding-box',
+    backgroundOrigin: 'padding-box',
     imageRendering: 'pixelated',
   };
 }
@@ -38,6 +40,23 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
   const npcs = useGameStore((state) => state.npcs);
   const movePlayer = useGameStore((state) => state.movePlayer);
   const enterEvent = useGameStore((state) => state.enterEvent);
+  const mapPixelWidth = map.width * map.tileSize;
+  const mapPixelHeight = map.height * map.tileSize;
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    function recalcScale() {
+      const nextScale = Math.max(
+        1,
+        Math.floor(Math.min(window.innerWidth / mapPixelWidth, window.innerHeight / mapPixelHeight)),
+      );
+      setScale(nextScale);
+    }
+
+    recalcScale();
+    window.addEventListener('resize', recalcScale);
+    return () => window.removeEventListener('resize', recalcScale);
+  }, [mapPixelHeight, mapPixelWidth]);
 
   useEffect(() => {
     if (mode.kind !== 'tilemap') {
@@ -85,12 +104,14 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
   const visibleNpcs = Object.entries(npcs).filter(([, npc]) => npc.mapId === map.id);
 
   return (
-    <main className="min-h-[100dvh] bg-[#11110f] text-[#f7f7f6] flex items-center justify-center p-4">
+    <main className="min-h-[100dvh] bg-[#11110f] text-[#f7f7f6] flex items-center justify-center overflow-hidden">
       <div
         className="relative overflow-hidden border border-[#4d453a] bg-[#191712] shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
         style={{
-          width: map.width * map.tileSize,
-          height: map.height * map.tileSize,
+          width: mapPixelWidth,
+          height: mapPixelHeight,
+          transform: `scale(${scale})`,
+          transformOrigin: 'center',
         }}
         aria-label={map.name}
       >
@@ -99,13 +120,23 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
           style={{
             gridTemplateColumns: `repeat(${map.width}, ${map.tileSize}px)`,
             gridTemplateRows: `repeat(${map.height}, ${map.tileSize}px)`,
+            gap: 0,
+            lineHeight: 0,
+            fontSize: 0,
           }}
         >
           {map.layers.ground.flatMap((row, y) =>
             row.map((tileId, x) => (
               <div
                 key={`ground-${x}-${y}`}
-                style={{ width: map.tileSize, height: map.tileSize, ...tileStyle(map, tileId) }}
+                style={{
+                  width: map.tileSize + 1,
+                  height: map.tileSize + 1,
+                  marginRight: -1,
+                  marginBottom: -1,
+                  display: 'block',
+                  ...tileStyle(map, tileId),
+                }}
               />
             )),
           )}
@@ -116,13 +147,23 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
           style={{
             gridTemplateColumns: `repeat(${map.width}, ${map.tileSize}px)`,
             gridTemplateRows: `repeat(${map.height}, ${map.tileSize}px)`,
+            gap: 0,
+            lineHeight: 0,
+            fontSize: 0,
           }}
         >
           {map.layers.objects.flatMap((row, y) =>
             row.map((tileId, x) => (
               <div
                 key={`object-${x}-${y}`}
-                style={{ width: map.tileSize, height: map.tileSize, ...tileStyle(map, tileId) }}
+                style={{
+                  width: map.tileSize + 1,
+                  height: map.tileSize + 1,
+                  marginRight: -1,
+                  marginBottom: -1,
+                  display: 'block',
+                  ...tileStyle(map, tileId),
+                }}
               />
             )),
           )}

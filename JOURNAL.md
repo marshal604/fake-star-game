@@ -202,3 +202,22 @@
 - **Notes**: Implemented VN event rendering from `EVENTS[eventId]`, office background wiring, choice and keyboard handling, v0.1 noop auto-advance for `spawnNpc`/`walkNpcTo`, automatic `returnToMap`/`end` transitions, final end screen, and App-level mode fade routing. Did not implement NPC walking animation, save/load, audio, or framer-motion. Added only a `data-dialogue-advance` marker to the existing Dialogue button so keyboard advance can reuse its current typewriter finish/advance behavior without changing the component flow.
 - **BLOCKER**: none
 - **Decisions made**: Prompt 008's completion section says to set `STATUS: done` and commit, but AGENTS.md and the user task require `STATUS: ready-for-commit` and no git commit, so those higher-priority workflow instructions were followed.
+
+## 2026-04-29 23:59 — codex-prompt 010 visual-fixes
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - ~ src/components/Tilemap/PlayerSprite.tsx
+  - ~ src/components/Tilemap/NpcSprite.tsx
+  - ~ JOURNAL.md
+  - ~ codex-prompts/010-visual-fixes.md
+- **Self-check**:
+  - typecheck: pass (`node_modules/.bin/tsc --noEmit`)
+  - lint: n/a
+  - dev server boot: n/a (sandbox)
+  - `git diff --check`: pass
+- **Notes**: Fixed sprite frame rendering to use 32x48 frames with feet-anchored positioning, tightened tile grid/cell styles to remove seams, and added integer viewport scale recalculation on load and resize. Did not regenerate assets, modify `office.json`, add NPC walking animation, or add dependencies.
+- **BLOCKER**: none
+- **Decisions made**: Used the prompt-requested React absolute sprite overlays and CSS grid seam fix path rather than converting tile rendering to canvas.
