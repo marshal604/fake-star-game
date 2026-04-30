@@ -125,6 +125,106 @@
   - Used measured `door_col=8` instead of prompt example `10`; trigger is `{x:8,y:1}` and BFS verifies reachability.
   - Used `anchor: top-left` only in the temporary compose placements to match the existing React renderer, which positions props by `left: prop.x * tileSize` and `top: prop.y * tileSize`.
 
+## 2026-05-01 02:04 — codex-prompt 029 orphanage-redo-full-pipeline
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/maps/orphanage-base.png
+  - + public/maps/orphanage-dressed-reference.png
+  - + public/maps/orphanage-layered-preview.png
+  - ~ public/props/orphanage/bed.png
+  - ~ public/props/orphanage/bookshelf.png
+  - ~ public/props/orphanage/table.png
+  - ~ public/props/orphanage/christmas-tree.png
+  - ~ public/props/orphanage/door.png
+  - ~ public/props/orphanage/toy.png
+  - ~ public/props/orphanage/blackboard.png
+  - ~ public/props/orphanage/small-chair.png
+  - ~ public/props/orphanage/plant.png
+  - + public/props/orphanage/book.png
+  - + public/props/orphanage/ball.png
+  - + public/props/orphanage/teddy.png
+  - + public/props/orphanage/crayon-box.png
+  - + public/props/orphanage/window-frame.png
+  - + public/props/orphanage/raw/
+  - + public/props/orphanage/extracted-large/
+  - + public/props/orphanage/extracted-small/
+  - ~ src/content/maps/orphanage.json
+  - ~ codex-prompts/029-orphanage-redo-full-pipeline.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck && pnpm build` failed at corepack cache write: `EPERM ... /Users/hubert/.cache/node/corepack/lastKnownGood.json`, deferred to Claude)
+  - lint: n/a (not requested; no runnable package manager in sandbox)
+  - dev server boot: n/a (sandbox)
+  - json parse: pass (`python3 -m json.tool src/content/maps/orphanage.json`)
+  - collision path: pass (BFS path from spawn `(7,8)` to trigger `(7,9)`)
+- **Verified output**:
+  1. Step 1 base:
+     - `public/maps/orphanage-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: empty warm wooden orphanage room shell; cream/yellow walls, two small top windows, continuous plank floor, no furniture/toys/decorations/characters/text.
+     - bottom-strip darkness scan found dark runs `(198..201)` and `(243..246)`; selected centered doorway run `(243..246)`, center `x=244`, so `door_col=7`.
+  2. Step 2 dressed reference:
+     - `public/maps/orphanage-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image placement matrix:
+       - bed1: upper-left at `(col 1, row 2)`, blue blanket, 2x2 footprint.
+       - bed2: upper-middle-left at `(col 4, row 2)`, pink blanket in reference but runtime shares blue bed asset, 2x2 footprint.
+       - blackboard: upper wall at `(col 7, row 1)`, about 2x1.
+       - window-frame decoration: small wall frame near `(col 5, row 1)`.
+       - christmas-tree: upper-right corner at `(col 11, row 1)`, about 2x2.
+       - bookshelf: lower-left wall at `(col 1, row 5)`, about 2x2.
+       - table: right-center at `(col 8, row 4)`, about 2x1.
+       - chair-left: left of table at `(col 7, row 4)`.
+       - chair-right: right of table at `(col 10, row 4)`.
+       - crayon-box: on table at `(col 9, row 4)`.
+       - toy chest: floor center-lower at `(col 7, row 6)`.
+       - ball: near toy chest at `(col 8, row 6)`.
+       - teddy: right of toy chest at `(col 10, row 6)`.
+       - plant: lower-right at `(col 11, row 6)`.
+       - door: bottom doorway aligned to `door_col=7`, runtime top-left `(col 7, row 8)` so it overlays the bottom opening.
+  3. Step 3 large props one-by-one:
+     - Raw/extract manifests all `edge_touch=false`.
+     - `bed.png`: final size `(64,64)`, residue `0`, runtime alpha bbox `(15,2,49,62)`, edge_touch `false`; contact sheet shows wooden kids' bed with blue blanket and pillow.
+     - `bookshelf.png`: final size `(64,80)`, residue `0`, bbox `(2,11,62,68)`, edge_touch `false`; contact sheet shows short wooden shelf with colorful books.
+     - `table.png`: final size `(64,32)`, residue `0`, bbox `(12,2,52,30)`, edge_touch `false`; contact sheet shows low wooden kids' table.
+     - `christmas-tree.png`: final size `(64,80)`, residue `0`, bbox `(6,2,57,78)`, edge_touch `false`; contact sheet shows decorated green tree with red/gold ornaments and star.
+     - `door.png`: final size `(32,48)`, residue `0`, bbox `(2,2,30,46)`, edge_touch `false`; contact sheet shows closed wooden door with brass handle.
+  4. Step 4 small prop pack 3x3:
+     - Raw pack extracted with `edge_touch_props=[]`.
+     - Contact sheet row 1: toy chest with toys, blackboard with chalk-like marks, small kids' chair.
+     - Contact sheet row 2: potted plant, open book, colorful ball.
+     - Contact sheet row 3: teddy bear, crayon box, small window frame.
+     - Finals: `toy.png (64,64) residue 0 edge_touch false`; `blackboard.png (64,40) residue 0 edge_touch false`; `small-chair.png (32,40) residue 0 edge_touch false`; `plant.png (40,48) residue 0 edge_touch false`; `book.png (32,24) residue 0 edge_touch false`; `ball.png (28,28) residue 0 edge_touch false`; `teddy.png (32,40) residue 0 edge_touch false`; `crayon-box.png (32,32) residue 0 edge_touch false`; `window-frame.png (40,40) residue 0 edge_touch false`.
+  5. Step 5 alpha clean:
+     - Opaque-magenta-residue check passed for all 14 final props with count `0`, below required `<50`.
+     - Runtime alpha bboxes do not touch image edges for all 14 props after final transparent padding.
+  6. Step 6 orphanage.json:
+     - `json.tool` parse passed; id `orphanage`, tileSize `32`, size `14x10`, baseUrl `/maps/orphanage-base.png`.
+     - Props list: bed1 `(1,2)` collision `2x2`; bed2 `(4,2)` collision `2x2`; blackboard `(7,1)` collision `2x1`; window-frame `(5,1)`; christmas-tree `(11,1)` collision `2x2`; bookshelf `(1,5)` collision `2x2`; book `(2,5)`; table `(8,4)` collision `2x1`; crayon-box `(9,4)`; chair-left `(7,4)` collision `1x1`; chair-right `(10,4)` collision `1x1`; toy `(7,6)` collision `1x1`; ball `(8,6)`; teddy `(10,6)`; plant `(11,6)` collision `1x1`; door `(7,8)`.
+     - Collision matrix:
+       - `[true,true,true,true,true,true,true,true,true,true,true,true,true,true]`
+       - `[true,false,false,false,false,false,false,true,true,false,false,true,true,true]`
+       - `[true,true,true,false,true,true,false,false,false,false,false,true,true,true]`
+       - `[true,true,true,false,true,true,false,false,false,false,false,false,false,true]`
+       - `[true,false,false,false,false,false,false,true,true,true,true,false,false,true]`
+       - `[true,true,true,false,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,true,true,false,false,false,false,true,false,false,false,true,false,true]`
+       - `[true,false,false,false,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,false,false,false,false,false,false,false,false,false,false,false,false,true]`
+       - `[true,true,true,true,true,true,true,false,true,true,true,true,true,true]`
+  7. Step 7 preview:
+     - `public/maps/orphanage-layered-preview.png`: Pillow size `(448,320)`, mode `RGBA`.
+     - view_image: preview shows the clean base plus aligned layered props: two beds along upper-left, window frame and blackboard on upper wall, christmas tree upper-right, bookshelf lower-left, table/chairs/crayon box right-center, toy/ball/teddy cluster lower-center, plant lower-right, and door overlay at the bottom doorway; no visible magenta residue.
+  8. Step 8 typecheck/build:
+     - `pnpm typecheck && pnpm build`: deferred to Claude / n/a (sandbox). Actual observed failure was corepack attempting to open `/Users/hubert/.cache/node/corepack/lastKnownGood.json` and receiving `EPERM`; build did not start after that.
+- **Notes**:
+  - Completed the 8-step orphanage layered raster pipeline using the 028 flow with orphanage-specific assets and placements.
+  - Did not touch office, portrait, sprite, or React code.
+- **BLOCKER**: none
+- **Decisions made**:
+  - Used runtime tile-sized transparent prop canvases matching the existing layered renderer's top-left placement contract.
+  - Collision union includes walls plus furniture/large floor blockers; surface decorations and tiny loose toys without collision remain walkable, matching the office layered convention.
+
 ## 2026-04-30 10:38 — codex-prompt 018 protagonist-identity-fix
 
 - **STATUS**: ready-for-commit

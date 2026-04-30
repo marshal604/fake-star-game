@@ -6,36 +6,46 @@
   "height": 10,
   "baseUrl": "/maps/orphanage-base.png",
   "props": [
-    { "id": "bed1", "url": "/props/orphanage/bed.png", "x": 1, "y": 1, "collision": { "x": 1, "y": 1, "w": 2, "h": 2 } },
-    { "id": "bed2", "url": "/props/orphanage/bed.png", "x": 4, "y": 1, "collision": { "x": 4, "y": 1, "w": 2, "h": 2 } },
-    { "id": "table", "url": "/props/orphanage/table.png", "x": 7, "y": 4, "collision": { "x": 7, "y": 4, "w": 2, "h": 1 } },
-    { "id": "chair1", "url": "/props/orphanage/small-chair.png", "x": 7, "y": 5, "collision": { "x": 7, "y": 5, "w": 1, "h": 1 } },
-    { "id": "chair2", "url": "/props/orphanage/small-chair.png", "x": 9, "y": 5, "collision": { "x": 9, "y": 5, "w": 1, "h": 1 } },
-    { "id": "blackboard", "url": "/props/orphanage/blackboard.png", "x": 10, "y": 1, "collision": { "x": 10, "y": 1, "w": 2, "h": 1 } },
-    { "id": "bookshelf", "url": "/props/orphanage/bookshelf.png", "x": 1, "y": 7, "collision": { "x": 1, "y": 7, "w": 2, "h": 2 } },
-    { "id": "toy", "url": "/props/orphanage/toy.png", "x": 11, "y": 6 },
-    { "id": "plant", "url": "/props/orphanage/plant.png", "x": 12, "y": 7 }
+    { "id": "bed1", "url": "/props/orphanage/bed.png", "x": 1, "y": 2, "z": 3, "collision": { "x": 1, "y": 2, "w": 2, "h": 2 } },
+    { "id": "bed2", "url": "/props/orphanage/bed.png", "x": 4, "y": 2, "z": 3, "collision": { "x": 4, "y": 2, "w": 2, "h": 2 } },
+    { "id": "blackboard", "url": "/props/orphanage/blackboard.png", "x": 7, "y": 1, "z": 2, "collision": { "x": 7, "y": 1, "w": 2, "h": 1 } },
+    { "id": "window-frame", "url": "/props/orphanage/window-frame.png", "x": 5, "y": 1, "z": 2 },
+    { "id": "christmas-tree", "url": "/props/orphanage/christmas-tree.png", "x": 11, "y": 1, "z": 4, "collision": { "x": 11, "y": 1, "w": 2, "h": 2 } },
+    { "id": "bookshelf", "url": "/props/orphanage/bookshelf.png", "x": 1, "y": 5, "z": 6, "collision": { "x": 1, "y": 5, "w": 2, "h": 2 } },
+    { "id": "book", "url": "/props/orphanage/book.png", "x": 2, "y": 5, "z": 7 },
+    { "id": "table", "url": "/props/orphanage/table.png", "x": 8, "y": 4, "z": 5, "collision": { "x": 8, "y": 4, "w": 2, "h": 1 } },
+    { "id": "crayon-box", "url": "/props/orphanage/crayon-box.png", "x": 9, "y": 4, "z": 6 },
+    { "id": "chair-left", "url": "/props/orphanage/small-chair.png", "x": 7, "y": 4, "z": 5, "collision": { "x": 7, "y": 4, "w": 1, "h": 1 } },
+    { "id": "chair-right", "url": "/props/orphanage/small-chair.png", "x": 10, "y": 4, "z": 5, "collision": { "x": 10, "y": 4, "w": 1, "h": 1 } },
+    { "id": "toy", "url": "/props/orphanage/toy.png", "x": 7, "y": 6, "z": 7, "collision": { "x": 7, "y": 6, "w": 1, "h": 1 } },
+    { "id": "ball", "url": "/props/orphanage/ball.png", "x": 8, "y": 6, "z": 7 },
+    { "id": "teddy", "url": "/props/orphanage/teddy.png", "x": 10, "y": 6, "z": 7 },
+    { "id": "plant", "url": "/props/orphanage/plant.png", "x": 11, "y": 6, "z": 7, "collision": { "x": 11, "y": 6, "w": 1, "h": 1 } },
+    { "id": "door", "url": "/props/orphanage/door.png", "x": 7, "y": 8, "z": 2 }
   ],
   "tilesetUrl": "/maps/orphanage-base.png",
   "tilesetCols": 1,
   "tilesetRows": 1,
-  "layers": { "ground": [], "objects": [] },
+  "layers": {
+    "ground": [],
+    "objects": []
+  },
   "collision": [
     [true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-    [true, true, true, false, true, true, false, false, false, false, true, true, false, true],
+    [true, false, false, false, false, false, false, true, true, false, false, true, true, true],
+    [true, true, true, false, true, true, false, false, false, false, false, true, true, true],
     [true, true, true, false, true, true, false, false, false, false, false, false, false, true],
-    [true, false, false, false, false, false, false, false, false, false, false, false, false, true],
-    [true, false, false, false, false, false, false, true, true, false, false, false, false, true],
-    [true, false, false, false, false, false, false, true, false, true, false, false, false, true],
-    [true, false, false, false, false, false, false, false, false, false, false, false, false, true],
+    [true, false, false, false, false, false, false, true, true, true, true, false, false, true],
     [true, true, true, false, false, false, false, false, false, false, false, false, false, true],
-    [true, true, true, false, false, false, false, false, false, false, false, false, false, true],
-    [true, true, true, true, true, true, false, false, true, true, true, true, true, true]
+    [true, true, true, false, false, false, false, true, false, false, false, true, false, true],
+    [true, false, false, false, false, false, false, false, false, false, false, false, false, true],
+    [true, false, false, false, false, false, false, false, false, false, false, false, false, true],
+    [true, true, true, true, true, true, true, false, true, true, true, true, true, true]
   ],
   "triggers": [
-    { "id": "orphanage.exit", "x": 6, "y": 9, "eventId": "orphanage-exit-stub", "autoFire": false }
+    { "id": "orphanage.exit", "x": 7, "y": 9, "eventId": "orphanage-exit-stub", "autoFire": false }
   ],
   "spawns": {
-    "player": { "x": 6, "y": 8, "facing": "up" }
+    "player": { "x": 7, "y": 8, "facing": "up" }
   }
 }
