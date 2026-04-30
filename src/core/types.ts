@@ -29,6 +29,7 @@ export interface TilemapData {
   tileSize: number;
   width: number;
   height: number;
+  baseUrl?: string;
   tilesetUrl: string;
   tilesetCols: number;
   tilesetRows: number;

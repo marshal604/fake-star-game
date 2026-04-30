@@ -31,6 +31,49 @@
 
 (尚無紀錄,等第一個 codex-prompt 執行後 codex 在此 append)
 
+## 2026-04-30 09:09 — codex-prompt 012 sprite-row-swap-and-resume-011
+
+- **STATUS**: done
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/sprites/protagonist.png
+  - ~ public/sprites/chenyifu.png
+  - + public/maps/office-tilemap.png
+  - - public/tilesets/office-tileset.png
+  - ~ src/core/types.ts
+  - ~ src/content/maps/office.json
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - ~ src/components/Tilemap/PlayerSprite.tsx
+  - ~ src/components/Tilemap/NpcSprite.tsx
+  - ~ JOURNAL.md
+  - ~ codex-prompts/012-sprite-row-swap-and-resume-011.md
+- **Self-check**:
+  - typecheck: n/a (sandbox)
+  - lint: n/a (sandbox)
+  - dev server boot: n/a (sandbox)
+  - sprite row view_image: pass
+  - office image size: pass (448x320 RGBA)
+  - office.json parse: pass
+- **Notes**: Task A1 found `protagonist` row 1 was left-facing and row 3 was right-facing. Task A2 used Pillow to swap rows 1 and 3 in `public/sprites/protagonist.png` and `public/sprites/chenyifu.png`; `public/sprites/suman.png` already matched target order and was not changed. Post-swap `view_image` verification showed row 1 right-facing and row 3 left-facing for protagonist, suman, and chenyifu. Task B used `$generate2dmap` parameters `visual_model=baked_raster`, `art_style=retro_pixel`, `visual_asset_source=image_gen`, `collision_model=none`, `runtime_object_model=none`, `output_format=PNG only`; generated source was 1484x1060 and was resized with Pillow to `public/maps/office-tilemap.png` at 448x320. Seamless self-eval: pass; the floor reads as one continuous wooden surface with no tile grid. Task C added optional `baseUrl`, wired `office.json` to `/maps/office-tilemap.png`, and made `TilemapScene` render one baked raster `<img>` when `baseUrl` exists while preserving grid rendering fallback. Task D removed `public/tilesets/office-tileset.png`. Task E observed a 2px bottom pad in protagonist frames and subtracted 2px from the `top` calculation in both sprite components.
+- **BLOCKER**: none
+- **Decisions made**: none
+
+## 2026-04-30 09:02 — codex-prompt 011 tileset-seamless-and-sprite-rows
+
+- **STATUS**: blocked
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ JOURNAL.md
+  - ~ codex-prompts/011-tileset-seamless-and-sprite-rows.md
+- **Self-check**:
+  - typecheck: n/a (blocked before code changes)
+  - lint: n/a (blocked before code changes)
+  - dev server boot: n/a (sandbox)
+  - sprite pixel inspection: pass
+- **Notes**: Task A inspected `public/sprites/protagonist.png`, `public/sprites/suman.png`, and `public/sprites/chenyifu.png` with `view_image`, then generated enlarged `/tmp` inspection sheets and measured non-transparent frame bounds with Pillow. All three source sheets are 128x192 with 32x48 frames. Vertical rows are consistent: row 0 is back/up, row 2 is front/down. The bottom anchor is consistent: visible pixels end at frame y=45, leaving a 2px bottom pad in all sheets, so the existing `top: y * tileSize - tileSize / 2` does not have a shared bottom-edge correction to apply. Side rows are inconsistent: `chenyifu` clearly uses row 1 as left-facing and row 3 as right-facing, while `suman` uses row 1 as right-facing and row 3 as left-facing. `protagonist` side rows are less distinct because the skin centroid is near center, but the three sheets are not all consistent because of the `suman` / `chenyifu` mismatch. Per prompt, Tasks B, C, and D were skipped after this blocker; no baked raster map was generated, no React/map schema changes were made, and `public/tilesets/office-tileset.png` was not deleted.
+- **BLOCKER**: Task A stop condition triggered. The three sprite sheets do not share a consistent left/right row layout, so updating shared `FACING_ROW` constants in `PlayerSprite.tsx` and `NpcSprite.tsx` would silently make at least one character face the wrong horizontal direction. Options considered: use one shared row mapping anyway, add per-sprite row mappings, or regenerate the inconsistent sprite sheet. The prompt explicitly requires blocking on inconsistency, so no implementation choice was made.
+- **Decisions made**: none
+
 ## 2026-04-30 ~01:00 — codex-prompt 007 event-runtime
 
 - **STATUS**: ready-for-commit

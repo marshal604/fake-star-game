@@ -115,59 +115,70 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
         }}
         aria-label={map.name}
       >
-        <div
-          className="absolute inset-0 grid"
-          style={{
-            gridTemplateColumns: `repeat(${map.width}, ${map.tileSize}px)`,
-            gridTemplateRows: `repeat(${map.height}, ${map.tileSize}px)`,
-            gap: 0,
-            lineHeight: 0,
-            fontSize: 0,
-          }}
-        >
-          {map.layers.ground.flatMap((row, y) =>
-            row.map((tileId, x) => (
-              <div
-                key={`ground-${x}-${y}`}
-                style={{
-                  width: map.tileSize + 1,
-                  height: map.tileSize + 1,
-                  marginRight: -1,
-                  marginBottom: -1,
-                  display: 'block',
-                  ...tileStyle(map, tileId),
-                }}
-              />
-            )),
-          )}
-        </div>
+        {map.baseUrl ? (
+          <img
+            src={map.baseUrl}
+            alt=""
+            className="absolute inset-0 w-full h-full object-fill"
+            style={{ imageRendering: 'pixelated' }}
+          />
+        ) : (
+          <>
+            <div
+              className="absolute inset-0 grid"
+              style={{
+                gridTemplateColumns: `repeat(${map.width}, ${map.tileSize}px)`,
+                gridTemplateRows: `repeat(${map.height}, ${map.tileSize}px)`,
+                gap: 0,
+                lineHeight: 0,
+                fontSize: 0,
+              }}
+            >
+              {map.layers.ground.flatMap((row, y) =>
+                row.map((tileId, x) => (
+                  <div
+                    key={`ground-${x}-${y}`}
+                    style={{
+                      width: map.tileSize + 1,
+                      height: map.tileSize + 1,
+                      marginRight: -1,
+                      marginBottom: -1,
+                      display: 'block',
+                      ...tileStyle(map, tileId),
+                    }}
+                  />
+                )),
+              )}
+            </div>
 
-        <div
-          className="absolute inset-0 grid"
-          style={{
-            gridTemplateColumns: `repeat(${map.width}, ${map.tileSize}px)`,
-            gridTemplateRows: `repeat(${map.height}, ${map.tileSize}px)`,
-            gap: 0,
-            lineHeight: 0,
-            fontSize: 0,
-          }}
-        >
-          {map.layers.objects.flatMap((row, y) =>
-            row.map((tileId, x) => (
-              <div
-                key={`object-${x}-${y}`}
-                style={{
-                  width: map.tileSize + 1,
-                  height: map.tileSize + 1,
-                  marginRight: -1,
-                  marginBottom: -1,
-                  display: 'block',
-                  ...tileStyle(map, tileId),
-                }}
-              />
-            )),
-          )}
-        </div>
+            <div
+              className="absolute inset-0 grid"
+              style={{
+                gridTemplateColumns: `repeat(${map.width}, ${map.tileSize}px)`,
+                gridTemplateRows: `repeat(${map.height}, ${map.tileSize}px)`,
+                gap: 0,
+                lineHeight: 0,
+                fontSize: 0,
+              }}
+            >
+              {map.layers.objects.flatMap((row, y) =>
+                row.map((tileId, x) => (
+                  <div
+                    key={`object-${x}-${y}`}
+                    style={{
+                      width: map.tileSize + 1,
+                      height: map.tileSize + 1,
+                      marginRight: -1,
+                      marginBottom: -1,
+                      display: 'block',
+                      ...tileStyle(map, tileId),
+                    }}
+                  />
+                )),
+              )}
+            </div>
+          </>
+        )}
 
         {visibleNpcs.map(([npcId, npc]) => (
           <NpcSprite

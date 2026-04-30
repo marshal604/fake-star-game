@@ -32,7 +32,7 @@ export function PlayerSprite({ x, y, facing, tileSize }: PlayerSpriteProps) {
       className="absolute z-20 pointer-events-none"
       style={{
         left: x * tileSize,
-        top: y * tileSize - tileSize / 2,
+        top: y * tileSize - tileSize / 2 - 2,
         width: tileSize,
         height: frameHeight,
         backgroundImage: 'url(/sprites/protagonist.png)',
