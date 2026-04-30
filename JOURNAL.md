@@ -78,6 +78,65 @@
      - suman.png: bottom y per row/frame is 45 for all 16 frames, so bottom y >= 43; row-boundary alpha_sum at y=47/48/49, 95/96/97, 143/144/145 is 0; transparent RGB nonzero count 0.
   5. Task E portrait trim:
      - suman-normal.png: trim_white_outline removed 2330 pixels on the first pass and 173 additional pixels on repeated same-method cleanup, total trimmed=2503; post-trim remaining near-white edge pixels=0 and transparent RGB nonzero count=0. view_image shows the outer halo removed against black/transparent background with no visible holes or large missing areas; internal white star and hair curl highlights remain.
+
+## 2026-04-30 10:41 — codex-prompt 019 remove-emotion-label-and-fullscreen-scale
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ src/components/Dialogue/CharacterPortrait.tsx
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - ~ codex-prompts/019-remove-emotion-label-and-fullscreen-scale.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck` failed with `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`)
+  - lint: n/a
+  - dev server boot: n/a
+- **Verified output**:
+  - `git diff -- src/components/Dialogue/CharacterPortrait.tsx src/components/Tilemap/TilemapScene.tsx` output:
+```diff
+diff --git a/src/components/Dialogue/CharacterPortrait.tsx b/src/components/Dialogue/CharacterPortrait.tsx
+index cd92e06..f172d23 100644
+--- a/src/components/Dialogue/CharacterPortrait.tsx
++++ b/src/components/Dialogue/CharacterPortrait.tsx
+@@ -14,11 +14,6 @@ export function CharacterPortrait({ name, position, emotion, imageUrl }: Charact
+           alt={name}
+           className="h-[46dvh] sm:h-[52dvh] md:h-[58dvh] w-auto object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+         />
+-        {emotion ? (
+-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-ink-100/70 bg-black/50 px-2 py-0.5 rounded">
+-            {emotion}
+-          </div>
+-        ) : null}
+       </div>
+     );
+   }
+@@ -70,7 +65,6 @@ export function CharacterPortrait({ name, position, emotion, imageUrl }: Charact
+       </svg>
+       <div className="mt-1 px-2 py-0.5 rounded text-[11px] text-ink-100/70 bg-black/40 font-display tracking-wide">
+         {name}
+-        {emotion ? <span className="ml-1.5 text-ink-100/50">· {emotion}</span> : null}
+       </div>
+       <span className="sr-only">{position}</span>
+     </div>
+diff --git a/src/components/Tilemap/TilemapScene.tsx b/src/components/Tilemap/TilemapScene.tsx
+index 571e921..407a87b 100644
+--- a/src/components/Tilemap/TilemapScene.tsx
++++ b/src/components/Tilemap/TilemapScene.tsx
+@@ -48,7 +48,7 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
+     function recalcScale() {
+       const nextScale = Math.max(
+         1,
+-        Math.floor(Math.min(window.innerWidth / mapPixelWidth, window.innerHeight / mapPixelHeight)),
++        Math.min(window.innerWidth / mapPixelWidth, window.innerHeight / mapPixelHeight),
+       );
+       setScale(nextScale);
+     }
+```
+  - typecheck output: `pnpm typecheck` failed before running due to sandbox/corepack permission: `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`; deferred to Claude.
+- **Notes**: Applied the exact search/replace blocks from codex-prompt 019: removed both emotion label render sites in CharacterPortrait and changed TilemapScene scale from floored integer scale to fractional min scale.
+- **BLOCKER**: none
+- **Decisions made**: none
      - protagonist-normal.png: trim_white_outline removed 0 pixels; post-trim remaining near-white edge pixels=0 and transparent RGB nonzero count=0. view_image still shows blue hair, gray suit, white shirt, and blue striped tie with no new holes or missing areas.
 - **Notes**: Used $generate2dsprite workflow with image_gen raw sheets, then Pillow/numpy postprocessing to chroma-key magenta, resize to 128x192, fit each frame to the chenyifu bbox anchors, clear only internal row boundaries by +/-1 px, and zero RGB for alpha=0 pixels. `public/sprites/chenyifu.png`, `public/portraits/chenyifu-normal.png`, map files, and React files were not modified. Generated raw images remain under `/Users/hubert/.codex/generated_images/019ddc39-d838-74f1-a4f5-2d22443f96ec/`.
 - **BLOCKER**: none
@@ -611,3 +670,5 @@
 - **Notes**: Regenerated protagonist and suman from the loaded VN portrait references using the prompt's chenyifu bbox anchor constraints. Raw image_gen sheets were mechanically magenta-keyed, scaled, and packed into 32x48 cells with Pillow, then `clean_row_boundary_only` cleared only boundary +/-1 px alpha.
 - **BLOCKER**: none
 - **Decisions made**: Used local Pillow packing because the raw image_gen outputs were large 4x4 sheets, not project-ready 128x192 sheets. The packing targeted the measured chenyifu row bboxes exactly and did not modify chenyifu, portraits, React, JSON, or map files.
+
+2026-04-30 10:43 CST — Mechanical TS6133 fix in src/components/Dialogue/CharacterPortrait.tsx; removed unused `emotion` from destructure only, kept interface unchanged; `pnpm typecheck` n/a (sandbox: Corepack EPERM opening /Users/hubert/.cache/node/corepack/lastKnownGood.json).

@@ -1,93 +1,101 @@
-# Codex Prompt 019 — 拿掉 'normal' emotion label + tilemap 滿版 scale
+# Codex Prompt 019 — 拿掉 'normal' emotion label + tilemap fractional scale 撐滿
 
-STATUS: pending
-SKILL: 無(純 React code task)
+STATUS: done
+SKILL: 無(純 React code task,沒 image_gen)
 依賴:008 完成
 產出:
-- `src/components/Dialogue/CharacterPortrait.tsx`(移除 emotion label rendering)
-- `src/components/Tilemap/TilemapScene.tsx`(scale 算式拿掉 `Math.floor`,允許 fractional 撐滿視窗)
-
-不動:其他所有檔案
+- `src/components/Dialogue/CharacterPortrait.tsx`(移除兩處 emotion label rendering)
+- `src/components/Tilemap/TilemapScene.tsx`(scale 算式去掉 `Math.floor`)
 
 ---
 
-## Bug A — 對話時立繪下方出現 'normal' 字
+## 任務:用精確 string search/replace 改這兩個檔(機械執行,不要解讀)
 
-### 根因
+### Change 1 — `src/components/Dialogue/CharacterPortrait.tsx`
 
-`src/components/Dialogue/CharacterPortrait.tsx`(從 badminton-story 移植)有 emotion label 渲染:
+#### 1a) Line 17-21:把這 5 行整段刪掉
+
+**Search this exact text:**
 
 ```tsx
-{emotion ? (
-  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs ...">
-    {emotion}
-  </div>
-) : null}
+        {emotion ? (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-ink-100/70 bg-black/50 px-2 py-0.5 rounded">
+            {emotion}
+          </div>
+        ) : null}
 ```
 
-我們 v0.1 EventGraph 把每段對白 `emotion: 'normal'` 寫死(`src/content/events/sign-suman.ts`),`emotion` 永遠 truthy → label 永遠顯示「normal」。
+**Replace with:** (空字串 — 直接刪)
 
-### 修法
+#### 1b) Line 71-74:把 emotion span 那行刪掉
 
-CharacterPortrait.tsx 直接**整段移除 emotion label rendering**(v0.1 不需要 emotion 視覺指示;v0.2+ 換不同 portrait file 來表達情緒,不需要 text label)。
+**Search this exact text:**
 
-具體:
-- 找 `if (imageUrl) {` 那個分支內的 `{emotion ? <div ...>{emotion}</div> : null}`,**整段刪掉**
-- 找 fallback SVG 分支內的 `{emotion ? <span ...>· {emotion}</span> : null}`,**整段刪掉**
-- 不要動 props interface(`emotion?: string` 留著,只是不 render)
-- 不要動 VnScene 或 EventGraph
-
-## Bug B — 像素地圖不是滿版
-
-### 根因
-
-`src/components/Tilemap/TilemapScene.tsx` 的 scale 算式:
-
-```ts
-setScale(Math.max(1, Math.floor(Math.min(sx, sy))));
+```tsx
+      <div className="mt-1 px-2 py-0.5 rounded text-[11px] text-ink-100/70 bg-black/40 font-display tracking-wide">
+        {name}
+        {emotion ? <span className="ml-1.5 text-ink-100/50">· {emotion}</span> : null}
+      </div>
 ```
 
-`Math.floor` 強制整數倍 scale。1870×878 viewport vs 448×320 map:
-- sx = 1870/448 ≈ 4.17, sy = 878/320 ≈ 2.74
-- min(sx, sy) ≈ 2.74
-- floor → 2
-- 結果:stage 顯示 896×640,viewport 留 letterbox 1870-896=974 px 寬閒置
+**Replace with:**
 
-### 修法
-
-去掉 `Math.floor`,允許 fractional scale 撐滿其中一邊(等比,不變形):
-
-```ts
-setScale(Math.max(1, Math.min(sx, sy)));
+```tsx
+      <div className="mt-1 px-2 py-0.5 rounded text-[11px] text-ink-100/70 bg-black/40 font-display tracking-wide">
+        {name}
+      </div>
 ```
 
-新結果:scale ≈ 2.74,stage 顯示 1228×878 撐滿 viewport 高,寬仍有 letterbox 但小很多。
+---
 
-**重要**:fractional scale 在 pixel art 上會 sub-pixel render,需要確認 `imageRendering: 'pixelated'` 已套在:
-- stage 內的 tile cells (010 已加)
-- player + npc sprite (010 已加)
-- baked tilemap `<img>`(若 011/012 加的 baseUrl render path)
+### Change 2 — `src/components/Tilemap/TilemapScene.tsx`
 
-如果 stage 容器外層也需要 `image-rendering: pixelated`,順便加上。
+Line 49-52:scale 算式去掉 `Math.floor`,允許 fractional scale 撐滿視窗。
 
-不要做:
-- 不要把 viewport 拉伸成非等比(會把 tile 變形)
-- 不要動 padding(維持 32px buffer 周圍的呼吸感)
-- 不要碰 ModeFader / VnScene / EndScene
+**Search this exact text:**
 
-## 完成後
+```tsx
+      const nextScale = Math.max(
+        1,
+        Math.floor(Math.min(window.innerWidth / mapPixelWidth, window.innerHeight / mapPixelHeight)),
+      );
+```
 
-1. JOURNAL.md append schema entry
+**Replace with:**
+
+```tsx
+      const nextScale = Math.max(
+        1,
+        Math.min(window.innerWidth / mapPixelWidth, window.innerHeight / mapPixelHeight),
+      );
+```
+
+---
+
+## Self-check(收工前)
+
+跑(sandbox 沒 pnpm 你可能跑不了,跑不了寫 deferred):
+
+```bash
+pnpm typecheck
+```
+
+並用 `git diff src/components/Dialogue/CharacterPortrait.tsx src/components/Tilemap/TilemapScene.tsx` 確認:
+- CharacterPortrait.tsx 比原本少 8 行(5 行 + 1 行 + 周圍空行)
+- TilemapScene.tsx 只有 1 行改動(`Math.floor(Math.min(...))` → `Math.min(...)`)
+
+## 完成後依 AGENTS.md
+
+1. JOURNAL.md append schema entry,**Verified output 段必填**:
+   - 列出兩個檔案的具體 diff(可用 `git diff <file>` 拷貝過去)
+   - typecheck 結果(deferred to Claude 也行)
 2. codex-prompts/019-...md STATUS: → ready-for-commit / blocked
-3. **不要 git commit / push**
-
-Verified output 段(必填):
-- 列出 CharacterPortrait.tsx 改動的具體 diff(刪掉哪幾行)
-- 列出 TilemapScene.tsx scale 算式改動 before/after
-- imageRendering: 'pixelated' 在哪些元素已套上(列舉)
+3. **不要 git commit / push**(Claude 跑 typecheck/build + chrome 實測再做)
 
 ## 不要做
 
-- 不要動 sprite / portrait / map(018 在處理)
-- 不要動 EventGraph
-- 不要加 lib
+- 不要動 props interface(`emotion?: string` 留著,只是不 render)
+- 不要動 VnScene / EventGraph / DialogueView / DialogueBox
+- 不要改 sprite / portrait / map(那是 018 範圍)
+- 不要加新 feature
+- 不要 push

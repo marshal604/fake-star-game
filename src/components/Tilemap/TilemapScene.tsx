@@ -48,7 +48,7 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
     function recalcScale() {
       const nextScale = Math.max(
         1,
-        Math.floor(Math.min(window.innerWidth / mapPixelWidth, window.innerHeight / mapPixelHeight)),
+        Math.min(window.innerWidth / mapPixelWidth, window.innerHeight / mapPixelHeight),
       );
       setScale(nextScale);
     }

@@ -5,7 +5,7 @@ interface CharacterPortraitProps {
   imageUrl?: string | undefined;
 }
 
-export function CharacterPortrait({ name, position, emotion, imageUrl }: CharacterPortraitProps) {
+export function CharacterPortrait({ name, position, imageUrl }: CharacterPortraitProps) {
   if (imageUrl) {
     return (
       <div className="relative">
@@ -14,11 +14,6 @@ export function CharacterPortrait({ name, position, emotion, imageUrl }: Charact
           alt={name}
           className="h-[46dvh] sm:h-[52dvh] md:h-[58dvh] w-auto object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
         />
-        {emotion ? (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-ink-100/70 bg-black/50 px-2 py-0.5 rounded">
-            {emotion}
-          </div>
-        ) : null}
       </div>
     );
   }
@@ -70,7 +65,6 @@ export function CharacterPortrait({ name, position, emotion, imageUrl }: Charact
       </svg>
       <div className="mt-1 px-2 py-0.5 rounded text-[11px] text-ink-100/70 bg-black/40 font-display tracking-wide">
         {name}
-        {emotion ? <span className="ml-1.5 text-ink-100/50">· {emotion}</span> : null}
       </div>
       <span className="sr-only">{position}</span>
     </div>
