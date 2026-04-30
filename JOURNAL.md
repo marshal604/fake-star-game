@@ -22,6 +22,7 @@
   - typecheck: pass | fail | n/a
   - lint: pass | fail | n/a
   - dev server boot: pass | fail | n/a
+- **Verified output**:(必填 — 視覺類 / 結構化資料類用 view_image/Pillow/json.tool 取得的實際證據,逐項描述。詳見 AGENTS.md「JOURNAL 寫法強制要求」段)
 - **Notes**: 自由說明
 - **BLOCKER**:(若 STATUS=blocked,寫具體問題;否則寫 none)
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)

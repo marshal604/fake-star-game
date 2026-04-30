@@ -63,6 +63,46 @@
 - Package manager:**pnpm**
 - Test(v0.1 不需要,但留位置):Vitest + Testing Library
 
+## JOURNAL 寫法強制要求(2026-04-30 加)
+
+**JOURNAL 必須記錄 output verification,不只 action log。**
+
+具體規則:
+
+- **Action log**(你做了什麼)→ 寫進 `Notes:` 跟 `Files changed:` ✅ 必要但不夠
+- **Output verification**(結果是什麼)→ 寫進新欄位 `Verified output:` ✅ 必要
+
+`Verified output:` 必須引用實際觀察到的證據,**不是「應該對」的推論**:
+
+| Deliverable type | Verified output 要寫什麼 |
+|---|---|
+| 圖檔(立繪 / sprite / map / tileset) | view_image 後**用人話**描述每張關鍵內容(例:「row 1 frame 1: 紫髮主角側站,頭髮在 frame 左側,臉朝畫面**左方**」),不要只寫「row 1=right」這種未驗證的 label |
+| sprite sheet 多 row | **逐 row 寫一行**描述,別省略 |
+| JSON | parse 結果(`json.tool` 通過 + 關鍵欄位值) |
+| Code 改動 | typecheck / build pass(自己跑或 deferred to Claude) |
+| Pillow 操作後的 PNG | 操作後再 view_image 一次,描述 visual change |
+
+**反例(不通過 review)**:
+```
+Notes: Swapped rows 1 and 3 in protagonist.png. suman.png left untouched.
+```
+→ 只是 action,沒驗證 swap 結果是否符合 target。
+
+**正例**:
+```
+Notes: Swapped rows 1 and 3 in protagonist.png. suman.png left untouched.
+Verified output:
+  - protagonist.png view_image after swap:
+    - row 0: 角色背對玩家 (up)
+    - row 1: side view, 髮在 frame 右側, 臉朝右 (right)  ← matches target row 1
+    - row 2: 角色正面, 看到臉 (down)
+    - row 3: side view, 髮在 frame 左側, 臉朝左 (left)  ← matches target row 3
+  - suman.png view_image: row 1 髮在右, row 3 髮在左 — matches target ✓
+  - chenyifu.png view_image: row 1 髮在右, row 3 髮在左 ✓
+```
+
+如果你做完發現 verified output 跟 target spec 不符,**直接寫 BLOCKER + STATUS=blocked,不要繼續往下做**(以前你誤把錯的當對的繼續走 → Claude review 才抓到 → 浪費一輪)。
+
 ## Sandbox 限制(macOS Seatbelt + workspace-write)
 
 你跑在 codex companion 的 `workspace-write` sandbox。實測限制:
