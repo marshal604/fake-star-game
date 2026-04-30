@@ -813,3 +813,87 @@ index 571e921..407a87b 100644
 - **Notes**: Mechanically applied Change 1 exact search/replace to the DialogueView dialogue wrapper className. Did not modify DialogueBox.tsx, CharacterPortrait.tsx, ChoiceList, or other TSX files.
 - **BLOCKER**: none
 - **Decisions made**: none
+
+## 2026-05-01 00:21 — codex-prompt 023 office-migrate-layered
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + public/maps/office-base.png
+  - + public/props/office/desk.png
+  - + public/props/office/chair.png
+  - + public/props/office/bookshelf.png
+  - + public/props/office/door.png
+  - + public/props/office/rug.png
+  - + public/props/office/phone.png
+  - + public/props/office/paper.png
+  - + public/props/office/lamp.png
+  - + public/props/office/plant.png
+  - ~ src/core/types.ts
+  - ~ src/content/maps/office.json
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - - public/maps/office-tilemap.png
+  - ~ codex-prompts/023-office-migrate-layered.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: pass (`./node_modules/.bin/tsc --noEmit`; `pnpm typecheck` n/a sandbox, corepack EPERM)
+  - lint: n/a
+  - dev server boot: n/a
+  - build: pass (`./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build`; `pnpm build` n/a sandbox, corepack EPERM)
+- **Verified output**:
+  1. Task A existing `office-tilemap.png` view_image observation:
+     - room frame: warm brown wood floor, darker wood wall panels around all sides, beige stone-like wall caps at corners/side breaks.
+     - desk at about col 2-4, row 2-3: dark wood desk against upper-left interior wall, PC/phone-like black object on left side and white paper on top.
+     - chair at about col 3, row 4: dark office chair below the desk, facing upward toward the desk.
+     - bookshelf at about col 2-3, row 7-8: two-tile-wide brown shelf with red/blue/yellow books in lower-left interior.
+     - red rug at about col 5-7, row 5: rectangular red patterned carpet near the room center.
+     - door at about col 10, row 0-1: closed brown door in the top wall, slightly right of center.
+  2. Task B `office-base.png`:
+     - Pillow: `public/maps/office-base.png` size `(448, 320)`, mode `RGB`, opaque.
+     - view_image: empty office base with only surrounding wood walls, continuous bare wood plank floor, and one dark top-wall doorway; no desk, chair, bookshelf, rug, plant, phone, paper, lamp, or furniture shadows visible.
+  3. Task C prop PNG verification:
+     - `desk.png`: `(96, 64)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows dark wood desk with PC.
+     - `chair.png`: `(32, 32)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows dark office chair.
+     - `bookshelf.png`: `(64, 64)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows brown shelf with colored books.
+     - `door.png`: `(32, 32)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows narrow brown door.
+     - `rug.png`: `(96, 64)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows red patterned carpet.
+     - `phone.png`: `(32, 32)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows small black phone.
+     - `paper.png`: `(32, 32)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows white paper stack.
+     - `lamp.png`: `(32, 32)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows desk lamp.
+     - `plant.png`: `(32, 32)`, `RGBA`, alpha extrema `(0, 255)`, opaque magenta pixels `0`; view preview shows green plant in brown pot.
+  4. Task D `types.ts` diff:
+     - `TilemapData` now includes optional `props?: Array<{ id; url; x; y; z?; collision? }>` immediately after `baseUrl?: string`.
+  5. Task E `office.json` verification:
+     - `python3 -m json.tool src/content/maps/office.json` passed.
+     - `baseUrl` is `/maps/office-base.png`; `props` count is `7`.
+     - prop list: desk `(1,2)` collision `{x:1,y:2,w:3,h:2}`; chair `(2,4)` collision `{x:2,y:4,w:1,h:1}`; bookshelf `(1,7)` collision `{x:1,y:7,w:2,h:2}`; rug `(5,4)`; phone `(3,2)`; paper `(2,3)`; door `(10,0)`.
+     - every `props[].url` points to an existing PNG under `public/props/office/`.
+     - trigger remains `{id:"office.door",x:10,y:2,eventId:"sign-suman",autoFire:true}`.
+     - spawn remains `{x:7,y:5,facing:"down"}`.
+     - collision row-major:
+```json
+[[true,true,true,true,true,true,true,true,true,true,true,true,true,true],
+[true,false,false,false,false,false,false,false,false,false,false,false,false,true],
+[true,true,true,true,false,false,false,false,false,false,false,false,false,true],
+[true,true,true,true,false,false,false,false,false,false,false,false,false,true],
+[true,false,true,false,false,false,false,false,false,false,false,false,false,true],
+[true,false,false,false,false,false,false,false,false,false,false,false,false,true],
+[true,false,false,false,false,false,false,false,false,false,false,false,false,true],
+[true,false,true,true,false,false,false,false,false,false,false,false,false,true],
+[true,false,true,true,false,false,false,false,false,false,false,false,false,true],
+[true,true,true,true,true,true,true,true,true,true,true,true,true,true]]
+```
+  6. Task F `TilemapScene.tsx` diff:
+     - added `const hasLayeredProps = Boolean(map.props?.length)`.
+     - render now branches `hasLayeredProps && map.baseUrl` first: base image fills stage at `zIndex: 0`, then each prop renders as absolute `<img>` at `left: prop.x * tileSize`, `top: prop.y * tileSize`, `zIndex: prop.z ?? prop.y + 1`, `imageRendering: pixelated`.
+     - existing baked `baseUrl` path and tile grid fallback remain after the layered branch.
+     - `/tmp/office-layered-preview.png` view_image: furniture appears in expected places on base: desk/chair/phone/paper in upper-left, bookshelf lower-left, rug near center, door prop at top-wall doorway area.
+  7. typecheck/build:
+     - `pnpm typecheck` and `pnpm build` both failed before scripts with sandbox/corepack `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`.
+     - equivalent local binaries passed: `./node_modules/.bin/tsc --noEmit` exit 0; `./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build` exit 0, Vite built 64 modules and emitted `dist/index.html`, CSS, JS.
+  8. final file listing:
+     - `find public/maps public/props/office -maxdepth 2 -type f -print | sort` output includes `public/maps/office-base.png` and 9 props: `bookshelf.png`, `chair.png`, `desk.png`, `door.png`, `lamp.png`, `paper.png`, `phone.png`, `plant.png`, `rug.png`.
+     - `public/maps/office-tilemap.png` is absent after `rm`.
+- **Notes**: Migrated office from baked raster to layered raster while preserving trigger `(10,2)`, spawn `(7,5)`, legacy tileset/layers fields, and existing tile fallback render behavior.
+- **BLOCKER**: none
+- **Decisions made**: Used direct local `node_modules/.bin` commands for verification after `pnpm` was blocked by sandbox/corepack cache permissions.

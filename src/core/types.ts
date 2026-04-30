@@ -30,6 +30,14 @@ export interface TilemapData {
   width: number;
   height: number;
   baseUrl?: string;
+  props?: Array<{
+    id: string;
+    url: string;
+    x: number;
+    y: number;
+    z?: number;
+    collision?: { x: number; y: number; w: number; h: number };
+  }>;
   tilesetUrl: string;
   tilesetCols: number;
   tilesetRows: number;

@@ -102,6 +102,7 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
   }, [enterEvent, map, mode.kind, movePlayer]);
 
   const visibleNpcs = Object.entries(npcs).filter(([, npc]) => npc.mapId === map.id);
+  const hasLayeredProps = Boolean(map.props?.length);
 
   return (
     <main className="min-h-[100dvh] bg-[#11110f] text-[#f7f7f6] flex items-center justify-center overflow-hidden">
@@ -115,7 +116,30 @@ export function TilemapScene({ mapId }: TilemapSceneProps) {
         }}
         aria-label={map.name}
       >
-        {map.baseUrl ? (
+        {hasLayeredProps && map.baseUrl ? (
+          <>
+            <img
+              src={map.baseUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-fill"
+              style={{ imageRendering: 'pixelated', zIndex: 0 }}
+            />
+            {map.props?.map((prop) => (
+              <img
+                key={prop.id}
+                src={prop.url}
+                alt=""
+                className="absolute pointer-events-none"
+                style={{
+                  left: prop.x * map.tileSize,
+                  top: prop.y * map.tileSize,
+                  zIndex: prop.z ?? prop.y + 1,
+                  imageRendering: 'pixelated',
+                }}
+              />
+            ))}
+          </>
+        ) : map.baseUrl ? (
           <img
             src={map.baseUrl}
             alt=""
