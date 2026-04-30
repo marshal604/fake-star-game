@@ -1,6 +1,6 @@
 # Codex Prompt 024 — 對話框 anchor 改 top(往下長,跟立繪連著)
 
-STATUS: pending
+STATUS: done
 SKILL: 無(純 React code task,不需 image_gen)
 依賴:022 完成
 產出:

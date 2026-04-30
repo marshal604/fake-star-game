@@ -775,3 +775,41 @@ index 571e921..407a87b 100644
 - **Notes**: Updated only the requested trigger coordinate and exact Tailwind class strings. Did not modify office-tilemap.png, sprites, portraits, state, runtime, or other components.
 - **BLOCKER**: none
 - **Decisions made**: Door visual spans cols 9-10; chose trigger x=10 because it is directly under the door center boundary and collision[2][10] is walkable.
+
+## 2026-05-01 00:11 — codex-prompt 024 dialogue-downward-growth
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ src/components/Dialogue/DialogueView.tsx
+  - ~ codex-prompts/024-dialogue-downward-growth.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; pnpm/corepack EPERM opening /Users/hubert/.cache/node/corepack/lastKnownGood.json)
+  - lint: n/a
+  - dev server boot: n/a (sandbox)
+- **Verified output**:
+  1. `git diff src/components/Dialogue/DialogueView.tsx`:
+     ```diff
+     diff --git a/src/components/Dialogue/DialogueView.tsx b/src/components/Dialogue/DialogueView.tsx
+     index 4328964..1889eea 100644
+     --- a/src/components/Dialogue/DialogueView.tsx
+     +++ b/src/components/Dialogue/DialogueView.tsx
+     @@ -77,7 +77,7 @@ export function DialogueView(props: DialogueViewProps) {
+      
+            {props.children}
+      
+     -      <div className="absolute bottom-0 left-0 right-0 z-20 px-3 sm:px-6 pb-[max(env(safe-area-inset-bottom),1rem)] sm:pb-10 md:pb-16 lg:pb-20">
+     +      <div className="absolute top-[82%] sm:top-[80%] md:top-[78%] left-0 right-0 z-20 px-3 sm:px-6 max-h-[22dvh] overflow-y-auto">
+              <div className="max-w-2xl mx-auto flex flex-col gap-2 sm:gap-3">
+                <DialogueBox
+                  speaker={props.speakerName}
+     ```
+  2. typecheck:
+     - `pnpm typecheck` did not run to completion in sandbox: corepack failed with `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`. Deferred to Claude.
+  3. File scope:
+     - Before JOURNAL/status metadata updates, `git diff --name-only` listed only `src/components/Dialogue/DialogueView.tsx`.
+     - Expected final changed files for this prompt: `src/components/Dialogue/DialogueView.tsx`, `JOURNAL.md`, and `codex-prompts/024-dialogue-downward-growth.md`.
+- **Notes**: Mechanically applied Change 1 exact search/replace to the DialogueView dialogue wrapper className. Did not modify DialogueBox.tsx, CharacterPortrait.tsx, ChoiceList, or other TSX files.
+- **BLOCKER**: none
+- **Decisions made**: none

@@ -77,7 +77,7 @@ export function DialogueView(props: DialogueViewProps) {
 
       {props.children}
 
-      <div className="absolute bottom-0 left-0 right-0 z-20 px-3 sm:px-6 pb-[max(env(safe-area-inset-bottom),1rem)] sm:pb-10 md:pb-16 lg:pb-20">
+      <div className="absolute top-[82%] sm:top-[80%] md:top-[78%] left-0 right-0 z-20 px-3 sm:px-6 max-h-[22dvh] overflow-y-auto">
         <div className="max-w-2xl mx-auto flex flex-col gap-2 sm:gap-3">
           <DialogueBox
             speaker={props.speakerName}
