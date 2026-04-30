@@ -672,3 +672,71 @@ index 571e921..407a87b 100644
 - **Decisions made**: Used local Pillow packing because the raw image_gen outputs were large 4x4 sheets, not project-ready 128x192 sheets. The packing targeted the measured chenyifu row bboxes exactly and did not modify chenyifu, portraits, React, JSON, or map files.
 
 2026-04-30 10:43 CST — Mechanical TS6133 fix in src/components/Dialogue/CharacterPortrait.tsx; removed unused `emotion` from destructure only, kept interface unchanged; `pnpm typecheck` n/a (sandbox: Corepack EPERM opening /Users/hubert/.cache/node/corepack/lastKnownGood.json).
+
+## 2026-04-30 10:49 — codex-prompt 020 flood-fill-enclosed-white
+
+- **STATUS**: blocked
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/portraits/suman-normal.png
+  - ~ codex-prompts/020-flood-fill-enclosed-white.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (image-only task)
+  - lint: n/a (image-only task)
+  - dev server boot: n/a (sandbox)
+- **Verified output**:
+  1. Task A top 5 opaque near-white components before cleanup:
+     - size=9450 bbox=[y 394..663, x 204..338] touches_edge=False aspect=0.500
+     - size=5555 bbox=[y 423..524, x 333..431] touches_edge=False aspect=0.971
+     - size=1017 bbox=[y 349..382, x 227..278] touches_edge=False aspect=0.654
+     - size=663 bbox=[y 666..747, x 281..344] touches_edge=False aspect=0.780
+     - size=657 bbox=[y 1079..1145, x 403..512] touches_edge=False aspect=0.609
+  2. Task B cleanup parameters and count:
+     - rgb_threshold=220, size_min=50, aspect_min=0.7, dim_min=10
+     - cleared pixel count=14546
+     - cleared largest components included size=9450 bbox=[y 394..663, x 204..338] aspect=0.500; size=1017 bbox=[y 349..382, x 227..278] aspect=0.654; size=657 bbox=[y 1079..1145, x 403..512] aspect=0.609; size=638 bbox=[y 678..759, x 330..378] aspect=0.598; size=573 bbox=[y 527..553, x 173..211] aspect=0.692
+  3. view_image after cleanup:
+     - 手跟臉之間仍有明顯白色背景區域；post-cleanup component measurement shows remaining size=5555 bbox=[y 423..524, x 333..431] aspect=0.971 in the face/raised-hand area.
+     - 衣服 white star logo 還在，胸前白色星形外框可見。
+     - 角色身上其他白色高光還在，包含頭髮白色高光、皮膚亮部、腰帶/配件亮部。
+- **Notes**: Ran the prompt-provided BFS component diagnosis and cleanup code on `public/portraits/suman-normal.png`. The specified rule removed elongated enclosed white slivers but did not remove the remaining near-square hand/face enclosed white component.
+- **BLOCKER**: Deliverable failed verification: hand/face enclosed white remains visible after Task B. The prompt's suggested retry of lowering `aspect_min` would clear fewer components and would not target the remaining aspect=0.971 component; raising `aspect_min` risks matching preserved logo/highlight components, so I stopped instead of tuning beyond the prompt.
+- **Decisions made**: none
+
+## 2026-04-30 11:16 — codex-prompt 021 regenerate-suman-portrait
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/portraits/suman-normal.png
+  - ~ codex-prompts/021-regenerate-suman-portrait.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (image-only task)
+  - lint: n/a (image-only task)
+  - dev server boot: n/a (sandbox)
+  - Pillow acceptance: pass
+- **Verified output**:
+  1. Reference view_image results:
+     - `references/suman-ref.png`: young woman with dark pink/magenta short hair, small twin braided buns/top knots, curled side strands, black-frame glasses, red sleeveless top with white star logo, exposed waist, blue denim lower half, white belt with red heart buckle, chain detail, red/white/blue wristbands, and one hand raised near her face.
+     - `public/portraits/protagonist-normal.png`: clean HD anime VN portrait with crisp dark line art, smooth cel shading, warm skin shading, controlled highlights, and transparent background.
+     - `public/portraits/chenyifu-normal.png`: same clean HD VN paint anchor, dark outline, soft cel-shaded clothing folds, warm palette, and transparent background.
+  2. Regenerated `public/portraits/suman-normal.png` Pillow metrics:
+     - Size: `(1536, 1024, 4)` after `convert('RGBA')`.
+     - Alpha=0: `1071442`; Alpha=255: `501422`; Alpha 1..254 halo: `0`.
+     - Opaque near-white pixels: `3584` (< 5000).
+     - Edge near-white pixels: `0 / 6704` (< 200).
+     - File mode/size: `RGBA`, 1024x1536, `533849` bytes (< 800 KB).
+  3. Regenerated portrait view_image:
+     - Clean transparent silhouette with dark/pink outline; no visible white outer edge artifact.
+     - The gap between raised hand/fingers and face/glasses reads as transparent black in the viewer, not enclosed white.
+     - The spaces around hair curls, cheek, neck, shoulder, and raised arm read as transparent black, not enclosed white slivers.
+     - White star logo on the red top, belt highlights, skin highlights, and small accessory highlights remain visible.
+     - Character identity matches the reference: magenta twin-bun/braid hair, glasses, red star top, denim shorts/jeans, heart belt buckle, wristbands, friendly VN pose with hand near glasses.
+  4. Raw generation/postprocess evidence:
+     - Raw generated image used: `/Users/hubert/.codex/generated_images/019ddc5f-3dc5-7740-ad54-3b4458637554/ig_075b51f4390ce5d40169f2c8a458e081918b5803728c3e4c7f.png`.
+     - First raw had bright magenta/pink background but not exact flat `#FF00FF`; chroma-key cleanup removed the generated magenta background and enclosed magenta regions before final RGBA PNG optimization.
+- **Notes**: Regenerated Suman as a clean HD 1024x1536 VN portrait, not a pixel sprite. Did not modify protagonist, chenyifu, sprites, maps, or React code.
+- **BLOCKER**: none
+- **Decisions made**: Used one generation attempt. Because the raw background was magenta/pink but not exact `#FF00FF`, used a constrained Pillow chroma-key mask for the generated magenta background, then quantized colors and saved back as RGBA PNG to satisfy the <800 KB output requirement while preserving transparency.
