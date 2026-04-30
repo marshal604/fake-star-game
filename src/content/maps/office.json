@@ -47,7 +47,7 @@
     [true, true, true, true, true, true, true, true, true, true, true, true, true, true]
   ],
   "triggers": [
-    { "id": "office.door", "x": 11, "y": 1, "eventId": "sign-suman", "autoFire": true }
+    { "id": "office.door", "x": 10, "y": 2, "eventId": "sign-suman", "autoFire": true }
   ],
   "spawns": {
     "player": { "x": 7, "y": 5, "facing": "down" }

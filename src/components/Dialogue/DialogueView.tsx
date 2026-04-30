@@ -60,7 +60,7 @@ export function DialogueView(props: DialogueViewProps) {
 
       {props.speakerName ? (
         <div
-          className={`absolute bottom-[26%] sm:bottom-[30%] z-10 ${portraitWrapperClass} transition-all duration-300 pointer-events-none`}
+          className={`absolute bottom-[18%] sm:bottom-[20%] md:bottom-[22%] z-10 ${portraitWrapperClass} transition-all duration-300 pointer-events-none`}
         >
           <CharacterPortrait
             name={props.speakerName}

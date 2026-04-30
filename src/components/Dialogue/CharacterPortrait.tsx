@@ -12,7 +12,7 @@ export function CharacterPortrait({ name, position, imageUrl }: CharacterPortrai
         <img
           src={imageUrl}
           alt={name}
-          className="h-[46dvh] sm:h-[52dvh] md:h-[58dvh] w-auto object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+          className="h-[69dvh] sm:h-[78dvh] md:h-[80dvh] w-auto object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
         />
       </div>
     );

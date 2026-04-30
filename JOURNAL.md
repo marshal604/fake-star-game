@@ -740,3 +740,38 @@ index 571e921..407a87b 100644
 - **Notes**: Regenerated Suman as a clean HD 1024x1536 VN portrait, not a pixel sprite. Did not modify protagonist, chenyifu, sprites, maps, or React code.
 - **BLOCKER**: none
 - **Decisions made**: Used one generation attempt. Because the raw background was magenta/pink but not exact `#FF00FF`, used a constrained Pillow chroma-key mask for the generated magenta background, then quantized colors and saved back as RGBA PNG to satisfy the <800 KB output requirement while preserving transparency.
+
+## 2026-04-30 21:33 — codex-prompt 022 trigger-align-and-portrait-resize
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ src/content/maps/office.json
+  - ~ src/components/Dialogue/CharacterPortrait.tsx
+  - ~ src/components/Dialogue/DialogueView.tsx
+  - ~ codex-prompts/022-trigger-align-and-portrait-resize.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; pnpm/corepack EPERM opening /Users/hubert/.cache/node/corepack/lastKnownGood.json)
+  - lint: n/a
+  - dev server boot: n/a (sandbox)
+- **Verified output**:
+  1. Task A door measurement:
+     - Pillow scan from prompt returned image size (320, 448, 4) and max darkness 255 for every col 0..13 in y=0..64, so max darkness alone was not discriminating.
+     - Follow-up tile stats in y=0..96 showed elevated top-wall darkness at col 9 mean=193.1 and col 10 mean=193.2, compared with neighboring col 8 mean=178.4 and col 11 mean=181.7.
+     - view_image of office-tilemap.png with 32px grid shows the wooden door across cols 9-10 on the top wall, with its visual center on the col 9/10 boundary at row 1. Conclusion used for trigger: door_col=10, door_row=1.
+  2. Task B office.json trigger:
+     - Before: triggers[0] x=11 y=1.
+     - After: triggers[0] x=10 y=2, directly below the measured door row.
+     - `python3 -m json.tool src/content/maps/office.json` passed; parsed collision[2][10] is False.
+  3. Task C CharacterPortrait diff:
+     - Before: `className="h-[46dvh] sm:h-[52dvh] md:h-[58dvh] w-auto object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]"`
+     - After: `className="h-[69dvh] sm:h-[78dvh] md:h-[80dvh] w-auto object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]"`
+  4. Task D DialogueView diff:
+     - Before: `className={\`absolute bottom-[26%] sm:bottom-[30%] z-10 ${portraitWrapperClass} transition-all duration-300 pointer-events-none\`}`
+     - After: `className={\`absolute bottom-[18%] sm:bottom-[20%] md:bottom-[22%] z-10 ${portraitWrapperClass} transition-all duration-300 pointer-events-none\`}`
+  5. typecheck:
+     - `pnpm typecheck` did not run to completion in sandbox: corepack failed with `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`. Deferred to Claude.
+- **Notes**: Updated only the requested trigger coordinate and exact Tailwind class strings. Did not modify office-tilemap.png, sprites, portraits, state, runtime, or other components.
+- **BLOCKER**: none
+- **Decisions made**: Door visual spans cols 9-10; chose trigger x=10 because it is directly under the door center boundary and collision[2][10] is walkable.
