@@ -897,3 +897,42 @@ index 571e921..407a87b 100644
 - **Notes**: Migrated office from baked raster to layered raster while preserving trigger `(10,2)`, spawn `(7,5)`, legacy tileset/layers fields, and existing tile fallback render behavior.
 - **BLOCKER**: none
 - **Decisions made**: Used direct local `node_modules/.bin` commands for verification after `pnpm` was blocked by sandbox/corepack cache permissions.
+
+## 2026-05-01 00:57 — codex-prompt 025 emotion-portraits
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + public/portraits/suman-shy.png
+  - + public/portraits/suman-happy.png
+  - + public/portraits/suman-sad.png
+  - + public/portraits/suman-cry.png
+  - + public/portraits/protagonist-serious.png
+  - + public/portraits/protagonist-smile.png
+  - + public/portraits/chenyifu-shy.png
+  - + public/portraits/chenyifu-happy.png
+  - + public/portraits/chenyifu-jealous.png
+  - ~ codex-prompts/025-emotion-portraits.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (image-only task)
+  - lint: n/a (image-only task)
+  - dev server boot: n/a (sandbox)
+  - Pillow verify: pass for 9/9 PNGs; mode RGBA, size 1024x1536, opaque near-white < 5000, edge near-white < 200, halo < 5%
+- **Verified output**:
+
+| 角色 | emotion | size | opaque_near_white | edge_near_white | retry count | view_image 自評(表情視覺對 spec) |
+|---|---|---:|---:|---:|---:|---|
+| suman | shy | 1024x1536 | 146 | 0 | 0 | 雙頰紅、低頭，雙手托臉，眼神往旁下閃避，保留紫紅辮子、黑框眼鏡、紅星背心、牛仔短褲、心形皮帶與鏈條。 |
+| suman | happy | 1024x1536 | 659 | 0 | 0 | 大笑、眼睛彎曲，右拳舉到胸前，身份配件與紅星背心保留。 |
+| suman | sad | 1024x1536 | 790 | 0 | 0 | 低頭、眉毛下垂、眼神黯淡、嘴抿，整體姿態收縮，保留紫紅髮與眼鏡。 |
+| suman | cry | 1024x1536 | 1701 | 0 | 0 | 有淚痕，用手背擦眼，眉頭緊蹙、嘴微開哭泣，紅星背心與牛仔/鏈條保留。 |
+| protagonist | serious | 1024x1536 | 413 | 0 | 0 | 皺眉、嘴抿、眼神嚴肅，肩膀前傾，保留藍色 spiky hair、灰西裝與藍白斜紋領帶。 |
+| protagonist | smile | 1024x1536 | 286 | 0 | 0 | 溫和微笑、眼神放鬆，灰西裝與藍白斜紋領帶身份一致。 |
+| chenyifu | shy | 1024x1536 | 1405 | 0 | 0 | 臉紅、別過頭，右手抓後頸尷尬，保留棕色 afro、淺藍 hoodie、紅 T-shirt 與項鍊。 |
+| chenyifu | happy | 1024x1536 | 1889 | 0 | 0 | 燦爛笑容、舉手比讚，淺藍 hoodie、紅 T-shirt、棕色 afro 身份一致。 |
+| chenyifu | jealous | 1024x1536 | 1109 | 0 | 0 | 皺眉、抿嘴，眼神低垂側看，雙臂抱胸呈嫉妒/防備姿態，身份保留。 |
+
+- **Notes**: Generated 9 clean_hd single-character VN portraits from the existing normal portraits as identity references. Used Pillow chroma-key postprocess from magenta background to RGBA transparency; reran postprocess where view_image showed enclosed magenta residue, without regenerating any image. No normal portrait, sprite, map, or React file was changed.
+- **BLOCKER**: none
+- **Decisions made**: none
