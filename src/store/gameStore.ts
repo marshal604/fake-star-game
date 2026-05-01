@@ -54,6 +54,7 @@ interface GameState {
     facing: Facing,
   ) => void;
   enterEvent: (eventId: string) => void;
+  goToEvent: (eventId: string, nodeId?: string) => void;
   exitToMap: (mapId: string, x: number, y: number, facing: Facing) => void;
   endGame: (reason: string) => void;
   advanceNode: (choice?: number) => void;
@@ -124,6 +125,18 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentEventId: eventId,
       currentNodeId: 'start',
     }),
+  goToEvent: (eventId, nodeId) => {
+    if (nodeId === undefined || nodeId === 'start') {
+      get().enterEvent(eventId);
+      return;
+    }
+
+    set({
+      mode: { kind: 'vn', eventId, nodeId },
+      currentEventId: eventId,
+      currentNodeId: nodeId,
+    });
+  },
   exitToMap: (mapId, x, y, facing) =>
     set((state) => ({
       mode: { kind: 'tilemap', mapId },

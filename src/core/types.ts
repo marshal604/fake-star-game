@@ -14,6 +14,7 @@ export type EventNode =
   | { type: 'walkNpcTo'; npcId: string; x: number; y: number; next: string }
   | { type: 'returnToMap'; mapId: string; x: number; y: number }
   | { type: 'enterMap'; mapId: string; x: number; y: number; facing: Facing }
+  | { type: 'goToEvent'; eventId: string; nodeId?: string }
   | { type: 'end'; reason: string };
 
 export interface ChoiceOption {

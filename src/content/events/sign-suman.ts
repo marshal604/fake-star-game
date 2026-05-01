@@ -47,7 +47,10 @@ export const signSuman: EventGraph = {
   },
   end_silent: { type: 'end', reason: '故事還沒開始就結束了。' },
   end_pending: { type: 'end', reason: '(v0.1 demo 到此為止,後續事件待續)' },
-  end_signed: { type: 'end', reason: '蘇嫚君加入了旗下藝人。\n第一年的故事,從這裡開始。' },
+  end_signed: {
+    type: 'goToEvent',
+    eventId: 'main-story',
+  },
 };
 
 if (import.meta.env.DEV) {

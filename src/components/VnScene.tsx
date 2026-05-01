@@ -15,6 +15,7 @@ export function VnScene({ eventId, nodeId }: Props) {
   const advanceNode = useGameStore((state) => state.advanceNode);
   const chooseOption = useGameStore((state) => state.chooseOption);
   const exitToMap = useGameStore((state) => state.exitToMap);
+  const goToEvent = useGameStore((state) => state.goToEvent);
   const endGame = useGameStore((state) => state.endGame);
   const playerMapId = useGameStore((state) => state.player.mapId);
 
@@ -46,6 +47,12 @@ export function VnScene({ eventId, nodeId }: Props) {
 
     exitToMap(node.mapId, node.x, node.y, node.facing);
   }, [exitToMap, node]);
+
+  useEffect(() => {
+    if (node.type !== 'goToEvent') return;
+
+    goToEvent(node.eventId, node.nodeId);
+  }, [goToEvent, node]);
 
   useEffect(() => {
     if (node.type !== 'end') return;

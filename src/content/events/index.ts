@@ -1,3 +1,4 @@
+import { mainStory } from './main-story';
 import { signSuman } from './sign-suman';
 import type { EventGraph } from '~/core/types';
 
@@ -38,6 +39,7 @@ const officeGoOrphanage: EventGraph = {
 };
 
 export const EVENTS: Record<string, EventGraph> = {
+  'main-story': mainStory,
   'sign-suman': signSuman,
   'orphanage-exit-stub': orphanageExitStub,
   'obo-exit-stub': oboExitStub,

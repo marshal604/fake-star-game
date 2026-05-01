@@ -28,6 +28,36 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 11:04 — codex-prompt 039 main-story-eventgraph
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ src/core/types.ts
+  - ~ src/store/gameStore.ts
+  - ~ src/components/VnScene.tsx
+  - + src/content/events/main-story.ts
+  - ~ src/content/events/index.ts
+  - ~ src/content/events/sign-suman.ts
+  - ~ codex-prompts/039-main-story-eventgraph.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: pass via `./node_modules/.bin/tsc --noEmit`; `pnpm typecheck` n/a (sandbox/corepack EPERM)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: pass via `./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build`; `pnpm build` n/a (sandbox/corepack EPERM)
+- **Verified output**:
+  1. `src/core/types.ts` diff: `EventNode` union now includes `| { type: 'goToEvent'; eventId: string; nodeId?: string }` between `enterMap` and `end`.
+  2. `src/store/gameStore.ts` diff: `GameState` now exposes `goToEvent(eventId: string, nodeId?: string): void`; implementation calls `enterEvent(eventId)` for missing/`start` nodeId, otherwise sets `mode/currentEventId/currentNodeId` to the requested event/node.
+  3. `src/components/VnScene.tsx` diff: added `const goToEvent = useGameStore((state) => state.goToEvent);` and a `goToEvent` `useEffect` that calls `goToEvent(node.eventId, node.nodeId)` when the active node type is `goToEvent`.
+  4. `src/content/events/index.ts` diff: added `import { mainStory } from './main-story';` and registered `'main-story': mainStory` in `EVENTS`.
+  5. `src/content/events/sign-suman.ts` diff: `end_signed` changed from an `end` node with reason text to `{ type: 'goToEvent', eventId: 'main-story' }`; `end_silent` and `end_pending` remain `end` nodes.
+  6. `src/content/events/main-story.ts` new file verification: parser check found `nodeCount: 36`, `firstNode: "start"`, ending nodes include `ending_protagonist_end` and `ending_neutral`; `hasE107Enter: false`; `danglingNext: []`. File includes DEV dangling-next validator with `[main-story]` warning prefix.
+  7. typecheck/build verification: `pnpm typecheck` and `pnpm build` both stopped before project checks with sandbox/corepack `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`; equivalent local binaries passed: `./node_modules/.bin/tsc --noEmit` exit 0, and `./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build` exit 0 with Vite building 69 modules and emitting `dist/index.html`, CSS, and JS.
+- **Notes**: Implemented the main-story EventGraph and cross-event transition from successful `sign-suman`. Did not touch portraits, sprites, maps, tilemaps, stub events, or git.
+- **BLOCKER**: none
+- **Decisions made**: Used direct local `node_modules/.bin` commands for verification after `pnpm` was blocked by sandbox/corepack cache permissions.
+
 ## 2026-05-01 10:58 — codex-prompt 038 scene-transition-system
 
 - **STATUS**: ready-for-commit
