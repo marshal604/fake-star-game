@@ -28,6 +28,83 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 09:10 — codex-prompt 031 pub-scene-full-pipeline
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - + public/maps/pub-base.png
+  - + public/maps/pub-dressed-reference.png
+  - + public/maps/pub-layered-preview.png
+  - + public/backgrounds/pub.png
+  - + public/props/pub/bar-counter.png
+  - + public/props/pub/pool-table.png
+  - + public/props/pub/jukebox.png
+  - + public/props/pub/booth-seat.png
+  - + public/props/pub/piano.png
+  - + public/props/pub/barstool.png
+  - + public/props/pub/bottle.png
+  - + public/props/pub/glass.png
+  - + public/props/pub/ashtray.png
+  - + public/props/pub/dartboard.png
+  - + public/props/pub/neon-sign.png
+  - + public/props/pub/whiskey-barrel.png
+  - + public/props/pub/coaster.png
+  - + public/props/pub/napkin.png
+  - + src/content/maps/pub.json
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - ~ src/content/scenes.ts
+  - ~ src/content/events/index.ts
+  - + scripts/compose_layered_preview.py
+  - ~ codex-prompts/031-pub-scene-full-pipeline.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: pass (`./node_modules/.bin/tsc --noEmit`); `pnpm typecheck && pnpm build` n/a (sandbox corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: pass (`./node_modules/.bin/vite build`)
+  - json parse: pass (`python3 -m json.tool src/content/maps/pub.json`)
+  - image assertions: pass (Pillow size/mode, prop residue, edge-touch, trigger/spawn walkability)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/pub-base.png`: Pillow size `(448, 320)`, mode `RGB`, file size `165741` bytes.
+     - view_image: empty dim top-down pub shell with dark wood walls, one small high top-wall window, continuous dark wood plank floor, and bottom-center entry opening; no bar, furniture, props, characters, text, or UI.
+     - Pillow bottom-strip brightness scan found the entry gap spanning cols `6` and `7`; center falls on `door_col=7`.
+  2. Step 2 dressed reference:
+     - `public/maps/pub-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`, file size `177555` bytes.
+     - view_image prop matrix from observed dressed reference:
+       - bar-counter: upper wall, around `(col 2,row 2)`, long horizontal counter with bottle shelves behind.
+       - pool-table: center, around `(col 5,row 4)`, green table with billiard balls.
+       - jukebox: upper-right wall, around `(col 11,row 1)`, upright glowing jukebox.
+       - booth-seat: lower-left corner, around `(col 1,row 6)`, red leather seating beside a small table.
+       - piano: lower-right wall, around `(col 11,row 6)`, small upright piano.
+       - barstools: in front of bar at `(col 3,row 3)`, `(col 5,row 3)`, `(col 7,row 3)`.
+       - bottle/glass: on bar surface around `(col 3,row 2)` and `(col 5,row 2)`.
+       - ashtray/coaster/napkin: lower-left table area around `(col 2,row 7)`, `(col 3,row 7)`, `(col 3,row 6)`.
+       - dartboard/neon-sign: left wall around `(col 1,row 4)` and `(col 1,row 3)`.
+       - whiskey-barrel: right middle around `(col 11,row 5)`.
+  3. Steps 3-5 prop generation and alpha verification:
+     - 5 large one-by-one props: `bar-counter.png (224,64) residue 0 edge_touch false`, `pool-table.png (80,72) residue 0 edge_touch false`, `jukebox.png (40,64) residue 0 edge_touch false`, `booth-seat.png (72,40) residue 0 edge_touch false`, `piano.png (72,40) residue 0 edge_touch false`.
+     - 9 small prop_pack props: `barstool.png (32,40) residue 0 edge_touch false`, `bottle.png (24,40) residue 0 edge_touch false`, `glass.png (24,32) residue 0 edge_touch false`, `ashtray.png (28,24) residue 0 edge_touch false`, `dartboard.png (36,36) residue 0 edge_touch false`, `neon-sign.png (48,32) residue 0 edge_touch false`, `whiskey-barrel.png (40,40) residue 0 edge_touch false`, `coaster.png (24,24) residue 0 edge_touch false`, `napkin.png (28,24) residue 0 edge_touch false`.
+     - view_image contact sheet: row 1 shows long wooden bar, green pool table, glowing jukebox, red booth, upright piano, red barstool, liquor bottle; row 2 shows beer glass, ashtray, dartboard, small neon sign, wooden barrel, round coaster, folded napkin. No solid magenta background is visible.
+  4. Step 6 VN background:
+     - `public/backgrounds/pub.png`: Pillow size `(1920, 1080)`, mode `P`, file size `1386750` bytes (`< 1.5 MB`).
+     - view_image: dim warm pub interior with polished bar, backlit liquor bottles, amber pendant lamps, brick/dark wood walls, red booth seating, jukebox, piano, pool table, and a mostly open lower-third floor area for dialogue UI.
+  5. Step 7 JSON and registrations:
+     - `src/content/maps/pub.json`: `json.tool` parse passed; id `pub`, name `19 號酒館`, `tileSize=32`, size `14x10`, `baseUrl=/maps/pub-base.png`, `props.length=16` placements using 14 unique prop PNG URLs.
+     - Trigger is `{ id: "pub.exit", x: 7, y: 9, eventId: "pub-exit-stub", autoFire: false }`; player spawn is `{ x: 7, y: 8, facing: "up" }`.
+     - Collision keeps trigger `(7,9)` walkable and spawn `(7,8)` walkable; bottom doorway also leaves `(6,9)` open.
+     - React diff verified: `TilemapScene.tsx` imports/registers `pubMap`; `scenes.ts` adds `pub: { backgroundUrl: '/backgrounds/pub.png' }`; `events/index.ts` adds `pub-exit-stub` ending with `(19號酒館劇情即將開放)`.
+  6. Step 8 preview and build:
+     - `public/maps/pub-layered-preview.png`: Pillow size `(448, 320)`, mode `RGBA`, file size `193995` bytes.
+     - view_image: preview shows the dark wood empty base dressed with bar and stools near the upper wall, pool table centered, jukebox upper-right, booth lower-left, wall dartboard/neon on the left wall, barrel/piano on the right, and bottom-center doorway unobstructed. No visible magenta background blocks.
+     - `./node_modules/.bin/tsc --noEmit`: pass.
+     - `./node_modules/.bin/vite build`: pass (`67 modules transformed`, production bundle emitted).
+     - `pnpm typecheck && pnpm build`: n/a (sandbox) because corepack cannot write `/Users/hubert/.cache/node/corepack/lastKnownGood.json`.
+- **Notes**: Ran the requested 8-step layered_raster pipeline for pub only. Did not modify office, orphanage, obo, portraits, or sprites. Used image generation for visible art and Pillow only for resizing, chroma-key cleanup, extraction, compression, preview composition, and verification.
+- **BLOCKER**: none
+- **Decisions made**: `door_col=7` uses the center of the two-column bottom doorway opening. Runtime JSON has 16 prop placements because barstools are repeated while the deliverable set has 14 unique prop PNG files.
+
 ## 2026-05-01 02:28 — codex-prompt 030 obo-scene-full-pipeline
 
 - **STATUS**: ready-for-commit

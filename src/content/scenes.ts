@@ -8,4 +8,7 @@ export const SCENES: Record<string, { backgroundUrl: string }> = {
   obo: {
     backgroundUrl: '/backgrounds/obo.png',
   },
+  pub: {
+    backgroundUrl: '/backgrounds/pub.png',
+  },
 };

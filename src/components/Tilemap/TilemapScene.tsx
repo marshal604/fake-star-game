@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import officeMap from '~/content/maps/office.json';
 import oboMap from '~/content/maps/obo.json';
 import orphanageMap from '~/content/maps/orphanage.json';
+import pubMap from '~/content/maps/pub.json';
 import { findTrigger, neighbour } from '~/core/tilemap';
 import type { TilemapData } from '~/core/types';
 import { useGameStore } from '~/store/gameStore';
@@ -13,6 +14,7 @@ const MAPS: Record<string, TilemapData> = {
   office: officeMap as TilemapData,
   obo: oboMap as TilemapData,
   orphanage: orphanageMap as TilemapData,
+  pub: pubMap as TilemapData,
 };
 
 interface TilemapSceneProps {
