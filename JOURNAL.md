@@ -28,6 +28,74 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 09:39 — codex-prompt 033 office-redo-v3-design-rules
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/maps/office-base.png
+  - ~ public/maps/office-dressed-reference.png
+  - ~ public/maps/office-layered-preview.png
+  - ~ public/props/office/desk.png
+  - ~ public/props/office/chair.png
+  - ~ public/props/office/bookshelf.png
+  - ~ public/props/office/door.png
+  - - public/props/office/phone.png
+  - - public/props/office/paper.png
+  - - public/props/office/plant.png
+  - - public/props/office/lamp.png
+  - - public/props/office/rug.png
+  - - public/props/office/trash.png
+  - - public/props/office/coffee-mug.png
+  - - public/props/office/book-stack.png
+  - - public/props/office/nameplate.png
+  - ~ src/content/maps/office.json
+  - ~ codex-prompts/033-office-redo-v3-design-rules.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck && pnpm build` hit corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: n/a (sandbox; same corepack EPERM)
+  - json parse: pass (`python3 -m json.tool src/content/maps/office.json`)
+  - image assertions: pass (Pillow size/mode, prop residue, edge-touch, deletion list, preview composition, walkability)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/office-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: clean HD top-down office shell with warm wood walls/floor, dark top-wall doorway recess, red oriental center rug, right-wall framed art and wall clock, low plant in the lower-left corner, small trash bin at lower-right, and `鉅子娛樂` sign above the doorway. Desk/chair/bookshelf/door panel areas are empty floor/recess, not drawn as props.
+     - Pillow doorway ROI scan found dark doorway bbox `x=220..329`, center `274.5px`; using left tile `door_col=8` for prop placement because the 32px door image aligns to the doorway recess at x=8.
+  2. Step 2 dressed reference:
+     - `public/maps/office-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image placement matrix:
+       - desk: upper-left, around `(col 1,row 2)`, L-shaped dark wood desk.
+       - chair: in front of desk, around `(col 3,row 4)`, black swivel chair.
+       - bookshelf: right/lower-right wall, around `(col 11,row 6)`, tall shelf with colored books.
+       - door: top-wall doorway, around `(col 8,row 0)`, closed wooden door with handle.
+     - Desk surface visibly includes integrated phone, papers, lamp, mug, and nameplate; these are not separate props.
+  3. Steps 3 and 5 prop generation and residue:
+     - `desk.png`: Pillow size `(96, 64)`, content bbox `(4, 2, 92, 62)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows an L-shaped dark desk with black phone, paper, lamp, mug, and `鉅子娛樂` nameplate on the desktop.
+     - `chair.png`: Pillow size `(48, 48)`, content bbox `(11, 2, 37, 46)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows one black office swivel chair.
+     - `bookshelf.png`: Pillow size `(64, 80)`, content bbox `(8, 2, 56, 78)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a wooden shelf with red/blue/green/yellow book spines.
+     - `door.png`: Pillow size `(32, 48)`, content bbox `(6, 12, 25, 46)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a narrow wooden door with brass handle.
+  4. Step 4 deletion:
+     - Confirmed deleted by shell `test ! -e`: `phone.png`, `paper.png`, `plant.png`, `lamp.png`, `rug.png`, `trash.png`, `coffee-mug.png`, `book-stack.png`, `nameplate.png`.
+     - `ls public/props/office` now returns only `bookshelf.png`, `chair.png`, `desk.png`, `door.png`.
+  5. Step 6 `office.json`:
+     - `json.tool` parse passed.
+     - `props` list is exactly `["desk", "chair", "bookshelf", "door"]`.
+     - Placements/collision: desk `(x=1,y=2)` collision `{x:1,y:2,w:3,h:2}`; chair `(x=3,y=4)` collision `{x:3,y:4,w:1,h:1}`; bookshelf `(x=11,y=6)` collision `{x:11,y:6,w:2,h:2}`; door `(x=8,y=0)`.
+     - Collision matrix is `10` rows x `14` cols; spawn `{x:7,y:5,facing:"down"}` and trigger `{x:8,y:1,eventId:"sign-suman",autoFire:true}` are walkable.
+     - BFS path from spawn to trigger passed: `(7,5) -> (8,5) -> (8,4) -> (8,3) -> (8,2) -> (8,1)`.
+  6. Step 7 composed preview:
+     - `public/maps/office-layered-preview.png`: Pillow size `(448, 320)`, mode `RGBA`.
+     - view_image: preview reads as a typical small office, with desk against the left wall, chair in front of desk, bookshelf along the lower-right wall, closed door aligned to the top doorway, red rug baked into the base floor, wall clock/art/sign still on the base, and low plant/trash remaining visual-only base decorations. No visible magenta residue or scattered small prop layer remains.
+  7. Step 8 typecheck/build:
+     - `pnpm typecheck && pnpm build`: not runnable in this sandbox; command failed immediately with `Internal Error: EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`.
+     - Per AGENTS sandbox rules, build/typecheck is deferred to Claude and was not retried.
+- **Notes**: Executed office redo v3 only. Did not modify other scene assets, portraits, or sprites. Used image generation for base/dressed/props and Pillow for resizing, chroma-key cleanup, final prop canvas placement, measurement, and preview verification.
+- **BLOCKER**: none
+- **Decisions made**: `door_col=8` uses the measured doorway left tile (`floor(274.5/32)`) instead of rounded center tile `9`; rounded center visually placed the door on the doorway's right edge and partially missed the recess.
+
 ## 2026-05-01 09:10 — codex-prompt 031 pub-scene-full-pipeline
 
 - **STATUS**: ready-for-commit
