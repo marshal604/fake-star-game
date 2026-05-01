@@ -28,6 +28,73 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 10:31 — codex-prompt 036 pub-redo-v3
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/maps/pub-base.png
+  - ~ public/maps/pub-dressed-reference.png
+  - ~ public/maps/pub-layered-preview.png
+  - ~ public/props/pub/bar-counter.png
+  - ~ public/props/pub/pool-table.png
+  - ~ public/props/pub/jukebox.png
+  - ~ public/props/pub/booth-seat.png
+  - ~ public/props/pub/piano.png
+  - - public/props/pub/barstool.png
+  - - public/props/pub/bottle.png
+  - - public/props/pub/glass.png
+  - - public/props/pub/ashtray.png
+  - - public/props/pub/dartboard.png
+  - - public/props/pub/neon-sign.png
+  - - public/props/pub/whiskey-barrel.png
+  - - public/props/pub/coaster.png
+  - - public/props/pub/napkin.png
+  - ~ src/content/maps/pub.json
+  - ~ codex-prompts/036-pub-redo-v3.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck && pnpm build` hit corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: n/a (sandbox; same corepack EPERM)
+  - json parse: pass (`python3 -m json.tool src/content/maps/pub.json`)
+  - image assertions: pass (Pillow size/mode, prop residue, edge alpha, deletion list, preview composition, collision, walkability)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/pub-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: clean HD top-down dim pub shell with dark wood walls and plank floor, bottom entry sign reading `19號酒館`, top-wall high windows, wall dartboard, wall neon signs, framed photos/posters, flat scattered floor items including small papers/coasters, a fallen glass/ashtray-like item, and a low round whiskey barrel marking at lower-left. The bar, pool table, jukebox, booth, and piano zones are empty floor with no large furniture baked in.
+     - Pillow bottom-door scan found bright doorway/sign bbox `x=189..261`, center `225.0px`; using `door_col=7` for trigger and player spawn.
+  2. Step 2 dressed reference:
+     - `public/maps/pub-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image placement matrix:
+       - bar-counter: upper wall, around `(col 2,row 1)`, long polished bar with bottle rack, taps, and small glasses.
+       - pool-table: center, around `(col 5,row 4)`, green felt table with billiard balls and cues.
+       - jukebox: right wall, around `(col 12,row 5)`, bright arched neon jukebox.
+       - booth-seat: bottom-left, around `(col 1,row 7)`, red leather booth with cushions.
+       - piano: right/bottom-right, around `(col 11,row 7)`, small upright wooden piano with keyboard.
+  3. Steps 3 and 5 prop generation and residue:
+     - `bar-counter.png`: Pillow size `(96, 64)`, content bbox `(3, 12, 93, 51)`, magenta residue `1`, opaque edge pixels `0`; view_image contact sheet shows a dark polished bar with integrated bottle rack, taps, and glasses.
+     - `pool-table.png`: Pillow size `(64, 64)`, content bbox `(3, 14, 61, 49)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a green pool table with balls and a cue-like diagonal detail.
+     - `jukebox.png`: Pillow size `(32, 64)`, content bbox `(3, 6, 29, 57)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a tall orange/red neon jukebox with arched body.
+     - `booth-seat.png`: Pillow size `(64, 48)`, content bbox `(10, 3, 54, 45)`, magenta residue `2`, opaque edge pixels `0`; view_image contact sheet shows a red leather L-shaped booth seat with integrated cushions.
+     - `piano.png`: Pillow size `(64, 48)`, content bbox `(8, 3, 56, 45)`, magenta residue `1`, opaque edge pixels `0`; view_image contact sheet shows a small wooden upright piano with visible keyboard.
+  4. Step 4 deletion:
+     - `find public/props/pub -maxdepth 1 -type f -name '*.png'` now returns exactly `bar-counter.png`, `booth-seat.png`, `jukebox.png`, `piano.png`, `pool-table.png`.
+     - Explicit absence check passed for `barstool`, `bottle`, `glass`, `ashtray`, `dartboard`, `neon-sign`, `whiskey-barrel`, `coaster`, and `napkin`.
+  5. Step 6 `pub.json`:
+     - `python3 -m json.tool src/content/maps/pub.json` passed.
+     - Parsed key fields: `id=pub`, `baseUrl=/maps/pub-base.png`, props `['bar-counter', 'pool-table', 'jukebox', 'booth-seat', 'piano']`.
+     - Collision matrix is `10` rows x `14` columns. Spawn `(7,8)` and trigger `(7,9)` are both walkable; BFS path from spawn to trigger is `true`.
+  6. Step 7 preview:
+     - `public/maps/pub-layered-preview.png`: Pillow size `(448, 320)`, mode `RGBA`.
+     - view_image: runtime preview reads as a dim Taiwanese pub with the five runtime props over the base: bar at upper-left/top, pool table center, jukebox on right wall, red booth bottom-left, and piano bottom-right. Wall decorations, entry sign, scattered floor items, and barrel remain baked into the base.
+  7. Step 8 typecheck/build:
+     - `pnpm typecheck && pnpm build` did not run to completion because sandbox blocked corepack cache write with `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`; deferred to Claude per AGENTS.md.
+- **Notes**: Completed pub redo v3 with only 5 large props; removed 9 old small prop PNGs; composed preview from the updated JSON. Did not modify office/orphanage/obo/set, portraits, or sprites.
+- **BLOCKER**: none
+- **Decisions made**: Used `door_col=7` from the measured bottom entry. Used a 96x64 visual canvas for `bar-counter` so the integrated bottle rack can extend behind the 3x1 collision footprint.
+
 ## 2026-05-01 10:14 — codex-prompt 035 obo-redo-v3
 
 - **STATUS**: ready-for-commit
