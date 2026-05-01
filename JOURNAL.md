@@ -28,6 +28,73 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 10:14 — codex-prompt 035 obo-redo-v3
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/maps/obo-base.png
+  - ~ public/maps/obo-dressed-reference.png
+  - ~ public/maps/obo-layered-preview.png
+  - ~ public/props/obo/escalator.png
+  - ~ public/props/obo/fountain.png
+  - ~ public/props/obo/kiosk.png
+  - ~ public/props/obo/vending-machine.png
+  - ~ public/props/obo/bench.png
+  - - public/props/obo/plant.png
+  - - public/props/obo/trash-bin.png
+  - - public/props/obo/info-board.png
+  - - public/props/obo/sign.png
+  - - public/props/obo/arcade-machine.png
+  - - public/props/obo/phone-booth.png
+  - - public/props/obo/coke-can.png
+  - - public/props/obo/shopping-bag.png
+  - - public/props/obo/coupon.png
+  - ~ src/content/maps/obo.json
+  - ~ codex-prompts/035-obo-redo-v3.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck && pnpm build` hit corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: n/a (sandbox; same corepack EPERM)
+  - json parse: pass (`python3 -m json.tool src/content/maps/obo.json`)
+  - image assertions: pass (Pillow size/mode, prop residue, edge alpha, deletion list, preview composition, collision, walkability)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/obo-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: clean HD top-down mall lobby with glass walls, neon `歐堡娛樂城` wall sign, cream/beige checker floor pattern, wall neon panels, potted plants in corners, left-wall digital info board, bottom-entry trash bin, and flat scattered floor items including a drink can, shopping bag/flyer, and paper coupon. The right escalator zone, center fountain zone, upper-left kiosk zone, left-wall vending zone, and bottom-right bench zone are empty floor.
+     - Bottom doorway is visually centered around columns `6-7`; using `door_col=6` for trigger and player spawn alignment.
+  2. Step 2 dressed reference:
+     - `public/maps/obo-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image placement matrix:
+       - kiosk: upper-left, around `(col 2,row 2)`, counter includes visible brochure rack and laptop.
+       - vending-machine: left wall, around `(col 1,row 4)`, tall red/blue machine with drink display.
+       - fountain: center, around `(col 6,row 4)`, stone basin with blue water and water spray.
+       - escalator: right side, around `(col 10,row 2)`, diagonal metal rails and steps.
+       - bench: bottom-right, around `(col 10,row 7)`, public bench facing the fountain area.
+  3. Steps 3 and 5 prop generation and residue:
+     - `escalator.png`: Pillow size `(96, 64)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a diagonal metal escalator with rails and dark steps.
+     - `fountain.png`: Pillow size `(64, 64)`, magenta residue `1`, opaque edge pixels `0`; view_image contact sheet shows a stone fountain basin with blue water and central spray.
+     - `kiosk.png`: Pillow size `(64, 32)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows an information counter with integrated laptop and colorful brochures.
+     - `vending-machine.png`: Pillow size `(32, 64)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a tall red/blue vending machine with drink columns and payment area.
+     - `bench.png`: Pillow size `(64, 32)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a brown mall bench with metal arms.
+  4. Step 4 deletion:
+     - `ls public/props/obo` returns exactly `bench.png`, `escalator.png`, `fountain.png`, `kiosk.png`, `vending-machine.png`.
+     - Explicit absence check passed for `plant`, `trash-bin`, `info-board`, `sign`, `arcade-machine`, `phone-booth`, `coke-can`, `shopping-bag`, `coupon`.
+  5. Step 6 `obo.json`:
+     - `python3 -m json.tool src/content/maps/obo.json` passed.
+     - Parsed key fields: `id=obo`, `baseUrl=/maps/obo-base.png`, props `['kiosk', 'escalator', 'vending-machine', 'fountain', 'bench']`.
+     - Collision matrix is `10` rows x `14` columns. Spawn `(6,8)` and trigger `(6,9)` are both walkable; BFS path from spawn to trigger is `true`.
+  6. Step 7 preview:
+     - `public/maps/obo-layered-preview.png`: Pillow size `(448, 320)`, mode `RGBA`.
+     - view_image: runtime preview reads as a mall atrium: kiosk upper-left, vending machine left wall, fountain centered, escalator on the right, bench bottom-right, while base decorations remain baked into the map.
+  7. Step 8 typecheck/build:
+     - `pnpm typecheck && pnpm build` did not run to completion because sandbox blocked corepack cache write with `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`; deferred to Claude per AGENTS.md.
+- **Notes**: Completed obo redo v3 with only 5 large props; removed 9 old small prop PNGs; composed preview from the updated JSON.
+- **BLOCKER**: none
+- **Decisions made**: Used `door_col=6` from the bottom doorway position and placed the single bench at `(10,7)` to match the prompt's bottom-right bench requirement.
+
 ## 2026-05-01 09:56 — codex-prompt 034 orphanage-redo-v3
 
 - **STATUS**: ready-for-commit
