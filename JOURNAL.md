@@ -28,6 +28,26 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 11:18 — codex-prompt 040 dialogue-review
+
+- **STATUS**: ready-for-review
+- **Commits**: pending Claude
+- **Files changed**:
+  - + codex-prompts/040-dialogue-review-report.md
+  - ~ codex-prompts/040-dialogue-review.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (review-only markdown; no code changed)
+  - lint: n/a (review-only markdown; no code changed)
+  - dev server boot: n/a (review-only markdown; no code changed)
+- **Verified output**:
+  1. Read all dialogue/narration/choice nodes from `src/content/events/sign-suman.ts` and `src/content/events/main-story.ts`.
+  2. `codex-prompts/040-dialogue-review-report.md` contains the required sections: overall assessment, per-node scoring tables for `sign-suman.ts` and `main-story.ts`, high-AI-feel rewrite examples, and 5 actionable items.
+  3. `codex-prompts/040-dialogue-review.md` status changed from `pending` to `ready-for-review` as requested.
+- **Notes**: Completed dialogue review pass only. Did not modify any `.ts` or `.tsx` files and did not run git commit/push.
+- **BLOCKER**: none
+- **Decisions made**: Used `ready-for-review` instead of AGENTS.md default `ready-for-commit` because prompt 040 explicitly requires Claude review before adoption.
+
 ## 2026-05-01 11:04 — codex-prompt 039 main-story-eventgraph
 
 - **STATUS**: ready-for-commit
