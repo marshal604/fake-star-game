@@ -28,6 +28,31 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 10:58 — codex-prompt 038 scene-transition-system
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ src/core/types.ts
+  - ~ src/components/VnScene.tsx
+  - ~ src/content/events/index.ts
+  - ~ codex-prompts/038-scene-transition-system.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck` hit corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: n/a (sandbox; `pnpm build` hit the same corepack EPERM)
+- **Verified output**:
+  1. `src/core/types.ts` diff: `EventNode` union now includes `| { type: 'enterMap'; mapId: string; x: number; y: number; facing: Facing }` between `returnToMap` and `end`.
+  2. `src/store/gameStore.ts` verification: read file; `GameState.exitToMap` signature is `(mapId: string, x: number, y: number, facing: Facing) => void`, and implementation sets `mode: { kind: 'tilemap', mapId }` plus `player: { ...state.player, mapId, x, y, facing }`. It uses the passed `mapId` and is not hardcoded to the current player map.
+  3. `src/components/VnScene.tsx` diff: added `playerMapId = useGameStore((state) => state.player.mapId)`, added an `enterMap` `useEffect` that calls `exitToMap(node.mapId, node.x, node.y, node.facing)`, and changed background resolution to `SCENES[playerMapId]?.backgroundUrl ?? SCENES.office.backgroundUrl`.
+  4. `src/content/events/index.ts` diff: added `officeGoOrphanage` graph with `start -> walking -> enter`, where `enter` is `{ type: 'enterMap', mapId: 'orphanage', x: 7, y: 8, facing: 'up' }`; `EVENTS` now includes `'office-go-orphanage': officeGoOrphanage`.
+  5. `pnpm typecheck` and `pnpm build` were attempted separately; both stopped before project checks because corepack could not write `/Users/hubert/.cache/node/corepack/lastKnownGood.json` under sandbox (`EPERM: operation not permitted`). Deferred to Claude per AGENTS.md.
+- **Notes**: Implemented the scene transition EventGraph support requested by prompt 038. Reused existing `exitToMap`; did not change `gameStore.ts` because it already accepts arbitrary `mapId`. Did not touch map JSON, portraits, sprites, or `sign-suman`.
+- **BLOCKER**: none
+- **Decisions made**: none
+
 ## 2026-05-01 10:51 — codex-prompt 037 set-scene-v3
 
 - **STATUS**: ready-for-commit

@@ -16,6 +16,7 @@ export function VnScene({ eventId, nodeId }: Props) {
   const chooseOption = useGameStore((state) => state.chooseOption);
   const exitToMap = useGameStore((state) => state.exitToMap);
   const endGame = useGameStore((state) => state.endGame);
+  const playerMapId = useGameStore((state) => state.player.mapId);
 
   const graph = EVENTS[eventId];
   if (!graph) {
@@ -38,6 +39,12 @@ export function VnScene({ eventId, nodeId }: Props) {
     if (node.type !== 'returnToMap') return;
 
     exitToMap(node.mapId, node.x, node.y, 'down');
+  }, [exitToMap, node]);
+
+  useEffect(() => {
+    if (node.type !== 'enterMap') return;
+
+    exitToMap(node.mapId, node.x, node.y, node.facing);
   }, [exitToMap, node]);
 
   useEffect(() => {
@@ -70,7 +77,7 @@ export function VnScene({ eventId, nodeId }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [chooseOption, isChoice, node]);
 
-  const backgroundUrl = SCENES.office.backgroundUrl;
+  const backgroundUrl = SCENES[playerMapId]?.backgroundUrl ?? SCENES.office.backgroundUrl;
 
   if (node.type === 'narration') {
     return (

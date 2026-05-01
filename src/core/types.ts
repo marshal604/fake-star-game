@@ -13,6 +13,7 @@ export type EventNode =
   | { type: 'spawnNpc'; npcId: string; mapId: string; x: number; y: number; next: string }
   | { type: 'walkNpcTo'; npcId: string; x: number; y: number; next: string }
   | { type: 'returnToMap'; mapId: string; x: number; y: number }
+  | { type: 'enterMap'; mapId: string; x: number; y: number; facing: Facing }
   | { type: 'end'; reason: string };
 
 export interface ChoiceOption {
