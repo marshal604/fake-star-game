@@ -11,4 +11,7 @@ export const SCENES: Record<string, { backgroundUrl: string }> = {
   pub: {
     backgroundUrl: '/backgrounds/pub.png',
   },
+  set: {
+    backgroundUrl: '/backgrounds/set.png',
+  },
 };

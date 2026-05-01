@@ -28,6 +28,69 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 10:51 — codex-prompt 037 set-scene-v3
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/maps/set-base.png
+  - ~ public/maps/set-dressed-reference.png
+  - + public/maps/set-layered-preview.png
+  - + public/backgrounds/set.png
+  - + public/props/set/camera-rig.png
+  - + public/props/set/light-stand.png
+  - + public/props/set/director-chair.png
+  - + public/props/set/green-screen.png
+  - + public/props/set/boom-mic.png
+  - + src/content/maps/set.json
+  - ~ src/components/Tilemap/TilemapScene.tsx
+  - ~ src/content/scenes.ts
+  - ~ src/content/events/index.ts
+  - ~ codex-prompts/037-set-scene-v3.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck && pnpm build` hit corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: n/a (sandbox; same corepack EPERM)
+  - json parse: pass (`python3 -m json.tool src/content/maps/set.json`)
+  - image assertions: pass (Pillow size/mode, prop residue, edge alpha, preview composition, collision union, walkability)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/set-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: clean HD top-down dark studio room with sound-baffled walls, bottom entry doorway, top-wall `永振片場` sign, wall monitor, wall clock, green painted wall area, gaffer tape floor markings, coiled cable, clapperboard, clipboard/script, coffee cup, spare light bulb, tripod, reflector, and boom-stand bag. The camera center area, physical green-screen area, director-chair spot, light corner, and boom side remain open floor.
+     - Pillow doorway scan on the lower center band measured the opening center at about `x=223px`; used `door_col=7` for trigger and spawn.
+  2. Step 2 dressed reference:
+     - `public/maps/set-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image placement matrix:
+       - camera-rig: centered on the marked shooting area, with dolly base, camera body, lens, and top monitor.
+       - green-screen: upper-right, separate standing green panel on frame in front of the wall.
+       - director-chair: lower-left of the center area, red canvas back labeled `DIRECTOR`.
+       - light stands: left and right corners, each with bright softbox and stand/cable silhouette.
+       - boom-mic: right side, with stand arm and fuzzy windscreen.
+  3. Steps 3 and 4 one-by-one props and residue:
+     - `camera-rig.png`: Pillow size `(96, 96)`, content bbox `(6, 2, 90, 94)`, magenta residue `8`, opaque edge pixels `0`; view_image contact sheet shows a large wheeled camera dolly with camera body, lens, viewfinder, and blue monitor.
+     - `light-stand.png`: Pillow size `(48, 64)`, content bbox `(12, 3, 36, 61)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a tall black light stand with integrated square softbox and cable bundle.
+     - `director-chair.png`: Pillow size `(48, 48)`, content bbox `(9, 3, 38, 45)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a folding director chair with red `DIRECTOR` back.
+     - `green-screen.png`: Pillow size `(96, 64)`, content bbox `(3, 4, 93, 60)`, magenta residue `6`, opaque edge pixels `0`; view_image contact sheet shows a wide standing chroma-key panel on a wheeled frame.
+     - `boom-mic.png`: Pillow size `(64, 96)`, content bbox `(8, 3, 56, 93)`, magenta residue `6`, opaque edge pixels `0`; view_image contact sheet shows a boom microphone stand with long arm and gray windscreen.
+  4. Step 5 VN background:
+     - `public/backgrounds/set.png`: Pillow size `(1920, 1080)`, mode `P`, no alpha, file size `972850` bytes.
+     - view_image: ground-level studio background with dark soundproofing, overhead lighting rigs, large green screen at back, camera dolly mid-ground, director chair, boom mic, softbox lights, cables, monitor, clock, and a mostly clean lower third for dialogue.
+  5. Step 6 `set.json` and registrations:
+     - `python3 -m json.tool src/content/maps/set.json` passed.
+     - Parsed key fields: `id=set`, `name=永振片場`, props `['camera-rig', 'green-screen', 'director-chair', 'light-stand', 'boom-mic']`.
+     - Collision matrix is `10` rows x `14` columns. Prop collision union is true for all 5 prop boxes. Spawn `(7,8)` and trigger `(7,9)` are both walkable; BFS path from spawn to trigger is `true`.
+     - `rg` confirmed `TilemapScene.tsx` imports/registers `setMap`, `scenes.ts` registers `/backgrounds/set.png`, and `events/index.ts` registers `set-exit-stub`.
+  6. Step 7 preview:
+     - `public/maps/set-layered-preview.png`: Pillow size `(448, 320)`, mode `RGBA`.
+     - view_image: runtime preview reads as a small TV studio with a large camera rig centered on the shooting mark, standing green screen upper-right, director chair lower-left, one light stand at right, and boom mic on the right, while the base keeps wall sign, clock, monitor, cables, clapperboard, clipboard, coffee cup, light bulb, tripod, reflector, and bag details.
+  7. Step 8 typecheck/build:
+     - `pnpm typecheck && pnpm build` did not run to completion because sandbox blocked corepack cache write with `EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`; deferred to Claude per AGENTS.md.
+- **Notes**: Completed set v3 layered pipeline with 5 runtime props only, generated new base/dressed reference/VN background, composed preview, and registered the set map, VN scene, and exit stub. Did not modify office/orphanage/obo/pub, portraits, or sprites.
+- **BLOCKER**: none
+- **Decisions made**: Used `door_col=7` from the measured bottom doorway center. Runtime JSON keeps exactly 5 props as specified; the dressed reference shows two light stands, but `set.json` includes one `light-stand` entry to satisfy the prompt's 5-prop schema. Stored `set.png` as an opaque palette PNG to meet the `< 1.5 MB` requirement.
+
 ## 2026-05-01 10:31 — codex-prompt 036 pub-redo-v3
 
 - **STATUS**: ready-for-commit

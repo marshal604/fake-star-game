@@ -13,9 +13,14 @@ const pubExitStub: EventGraph = {
   start: { type: 'end', reason: '(19號酒館劇情即將開放)' },
 };
 
+const setExitStub: EventGraph = {
+  start: { type: 'end', reason: '(永振片場劇情即將開放)' },
+};
+
 export const EVENTS: Record<string, EventGraph> = {
   'sign-suman': signSuman,
   'orphanage-exit-stub': orphanageExitStub,
   'obo-exit-stub': oboExitStub,
   'pub-exit-stub': pubExitStub,
+  'set-exit-stub': setExitStub,
 };
