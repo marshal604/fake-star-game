@@ -28,6 +28,78 @@
 - **Decisions made**:(若有 deviation,列出 — 由 Claude review 是否認可)
 ```
 
+## 2026-05-01 09:56 — codex-prompt 034 orphanage-redo-v3
+
+- **STATUS**: ready-for-commit
+- **Commits**: pending Claude
+- **Files changed**:
+  - ~ public/maps/orphanage-base.png
+  - ~ public/maps/orphanage-dressed-reference.png
+  - ~ public/maps/orphanage-layered-preview.png
+  - ~ public/props/orphanage/bed.png
+  - ~ public/props/orphanage/bookshelf.png
+  - ~ public/props/orphanage/table.png
+  - ~ public/props/orphanage/christmas-tree.png
+  - ~ public/props/orphanage/door.png
+  - - public/props/orphanage/toy.png
+  - - public/props/orphanage/small-chair.png
+  - - public/props/orphanage/plant.png
+  - - public/props/orphanage/book.png
+  - - public/props/orphanage/ball.png
+  - - public/props/orphanage/teddy.png
+  - - public/props/orphanage/crayon-box.png
+  - - public/props/orphanage/window-frame.png
+  - - public/props/orphanage/blackboard.png
+  - ~ src/content/maps/orphanage.json
+  - ~ codex-prompts/034-orphanage-redo-v3.md
+  - ~ JOURNAL.md
+- **Self-check**:
+  - typecheck: n/a (sandbox; `pnpm typecheck && pnpm build` hit corepack EPERM on `/Users/hubert/.cache/node/corepack/lastKnownGood.json`)
+  - lint: n/a (not requested)
+  - dev server boot: n/a (not requested)
+  - build: n/a (sandbox; same corepack EPERM)
+  - json parse: pass (`python3 -m json.tool src/content/maps/orphanage.json`)
+  - image assertions: pass (Pillow size/mode, prop residue, edge-touch, deletion list, preview composition, collision union, walkability)
+- **Verified output**:
+  1. Step 1 base map:
+     - `public/maps/orphanage-base.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image: clean HD top-down orphanage room with pastel walls, warm wood floor, two top-wall windows, centered chalk blackboard, `育幼院` sign, round kids rug, floor toys (teddy, ball, toy car), corner plant, crayon box and book. Bed/bookshelf/table/tree/door areas are left empty with no prop shadows.
+     - Bottom doorway visual center measured at about `x=224px`; using `door_col=7` for the 1x1 bottom door, trigger, and player spawn alignment.
+  2. Step 2 dressed reference:
+     - `public/maps/orphanage-dressed-reference.png`: Pillow size `(448, 320)`, mode `RGB`.
+     - view_image placement matrix:
+       - bed 1: upper-left, around `(col 1,row 2)`, small kid bed with blue blanket.
+       - bed 2: upper-left/center-left, around `(col 4,row 2)`, small kid bed with pink blanket.
+       - bookshelf: left wall/lower-left, around `(col 1,row 5)`, short shelf with colorful books.
+       - table: right-center, around `(col 8,row 4)`, low wooden table with a book on top.
+       - christmas-tree: upper-right, around `(col 11,row 1)`, decorated tree with ornaments and star.
+       - door: bottom doorway, around `(col 7,row 9)`, closed wooden door panel.
+  3. Steps 3 and 5 prop generation and residue:
+     - `bed.png`: Pillow size `(64, 64)`, content bbox `(11, 2, 53, 62)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows one wooden kids bed with blue blanket, pillow, and stuffed bear integrated on top.
+     - `bookshelf.png`: Pillow size `(64, 80)`, content bbox `(3, 7, 61, 77)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a short wooden bookshelf with colorful integrated book spines and lower drawers.
+     - `table.png`: Pillow size `(64, 32)`, content bbox `(8, 2, 56, 30)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a low wooden kids table with a single book/notebook integrated on the tabletop.
+     - `christmas-tree.png`: Pillow size `(64, 80)`, content bbox `(6, 2, 57, 78)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a green christmas tree with red/gold ornaments and a star.
+     - `door.png`: Pillow size `(32, 32)`, content bbox `(8, 1, 24, 31)`, magenta residue `0`, opaque edge pixels `0`; view_image contact sheet shows a closed wooden door with brass handle.
+  4. Step 4 deletion:
+     - Confirmed deleted by shell `test ! -e` equivalent check: `toy.png`, `small-chair.png`, `plant.png`, `book.png`, `ball.png`, `teddy.png`, `crayon-box.png`, `window-frame.png`, `blackboard.png`.
+     - `find public/props/orphanage -maxdepth 1 -type f` now returns only `bed.png`, `bookshelf.png`, `christmas-tree.png`, `door.png`, `table.png`.
+  5. Step 6 `orphanage.json`:
+     - `json.tool` parse passed.
+     - `props` list is exactly `["bed1", "bed2", "bookshelf", "table", "christmas-tree", "door"]`.
+     - Placements/collision: bed1 `(x=1,y=2)` collision `{x:1,y:2,w:2,h:2}`; bed2 `(x=4,y=2)` collision `{x:4,y:2,w:2,h:2}`; bookshelf `(x=1,y=5)` collision `{x:1,y:5,w:2,h:2}`; table `(x=8,y=4)` collision `{x:8,y:4,w:2,h:1}`; christmas-tree `(x=11,y=1)` collision `{x:11,y:1,w:2,h:2}`; door `(x=7,y=9)`.
+     - Collision matrix is `10` rows x `14` cols and matches wall + prop-collision union with doorway tile `(7,9)` left walkable.
+     - Spawn `{x:7,y:8,facing:"up"}` and trigger `{x:7,y:9,eventId:"orphanage-exit-stub",autoFire:false}` are walkable.
+     - BFS path from spawn to trigger passed: `(7,8) -> (7,9)`.
+  6. Step 7 composed preview:
+     - `public/maps/orphanage-layered-preview.png`: Pillow size `(448, 320)`, mode `RGBA`.
+     - view_image: preview reads as a typical children/orphanage room, with two beds along the upper-left, bookshelf on the left wall, table right of the rug, decorated christmas tree in the upper-right, and a closed door aligned to the bottom doorway. Rug, toys, plant, windows, sign, blackboard, crayons, and floor book remain baked into the base; no old small prop layer or visible magenta remains.
+  7. Step 8 typecheck/build:
+     - `pnpm typecheck && pnpm build`: not runnable in this sandbox; command failed immediately with `Internal Error: EPERM: operation not permitted, open '/Users/hubert/.cache/node/corepack/lastKnownGood.json'`.
+     - Per AGENTS sandbox rules, build/typecheck is deferred to Claude and was not retried.
+- **Notes**: Executed orphanage redo v3 only. Did not modify office/obo/pub/set, portraits, or sprites. Used image generation for base/dressed/props and Pillow for RGB resize, chroma-key cleanup, final prop canvas placement, measurement, and preview verification.
+- **BLOCKER**: none
+- **Decisions made**: Used a 32x32 door prop at `y=9` to satisfy the prompt's 1x1 bottom-door placement without preview clipping.
+
 ## 2026-05-01 09:39 — codex-prompt 033 office-redo-v3-design-rules
 
 - **STATUS**: ready-for-commit
